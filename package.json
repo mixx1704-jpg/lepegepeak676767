@@ -1,0 +1,1 @@
+{"name":"abismo-dos-ecos","private":true,"type":"module","scripts":{"test":"node --test tests/inferno.test.mjs","preview":"node tools/serve.mjs","sync":"node tools/sync.mjs","balance":"node tools/balance.mjs"}}

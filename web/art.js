@@ -1,0 +1,17 @@
+// Original procedural vector art. No external game assets required.
+export function portrait(boss=false,phase=1,type='sombrio'){
+ const colors={fogo:['#df9b62','#713f34'],veneno:['#9cbf8a','#3e6657'],gelo:['#9bc4d1','#425c77'],sombrio:['#b3a2cf','#544a6b'],eletrico:['#d3c892','#6b6545']},[light,dark]=colors[type]||colors.sombrio;
+ return `<svg class="portrait" viewBox="0 0 180 210" aria-hidden="true"><defs><linearGradient id="g-${type}-${boss}" x2="1" y2="1"><stop stop-color="${light}"/><stop offset="1" stop-color="${dark}"/></linearGradient></defs><ellipse cx="90" cy="198" rx="58" ry="8" fill="#000" opacity=".3"/>${boss?`<path d="M40 80 L12 43 24 101 8 138 44 123 34 179 64 164 90 204 116 164 146 179 136 123 172 138 156 101 168 43 140 80" fill="${dark}" stroke="${light}" stroke-opacity=".6"/>`:''}<path d="M64 84 L41 120 30 188 75 176 90 199 106 176 150 188 139 120 116 84" fill="${dark}" stroke="${light}" stroke-width="1.5"/><path d="M90 40 L58 66 65 103 90 126 116 103 122 66 Z" fill="url(#g-${type}-${boss})"/><path d="M59 68 L48 27 75 53 90 9 105 53 132 27 121 68" fill="${dark}" stroke="${light}"/><path d="M68 75 L83 82 68 87 M112 75 L97 82 112 87" fill="${phase===2?'#ff6868':'#d6ebbc'}"/><path d="M90 83 L83 106 97 106 Z M72 112 L90 124 108 112 M90 128 L72 155 90 182 108 155 Z" fill="#162322" stroke="${light}" stroke-width="1"/><path d="M47 124 L67 132 M113 132 L133 124 M41 150 L60 154 M120 154 L139 150" stroke="${light}" opacity=".5"/>${phase===2?'<circle cx="90" cy="153" r="9" fill="#e78c64"/>':'<circle cx="90" cy="153" r="5" fill="#b9cda6"/>'}</svg>`;
+}
+let frame;
+export function scene(canvas){
+ cancelAnimationFrame(frame);if(!canvas)return;const ctx=canvas.getContext('2d'),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;let t=0;
+ const render=()=>{const w=canvas.clientWidth,h=canvas.clientHeight,dpr=Math.min(devicePixelRatio||1,2);if(canvas.width!==w*dpr||canvas.height!==h*dpr){canvas.width=w*dpr;canvas.height=h*dpr;}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);const cx=w*.65;
+  const glow=ctx.createRadialGradient(cx,h*.5,0,cx,h*.5,h*.65);glow.addColorStop(0,'#829a6545');glow.addColorStop(.5,'#42675022');glow.addColorStop(1,'#0000');ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);
+  for(let i=0;i<9;i++){const x=w*(i/8),y=20+(i*37%70);ctx.fillStyle=i%2?'#0c191bd9':'#20312caa';ctx.beginPath();ctx.moveTo(x-25,h);ctx.lineTo(x-18,y+40);ctx.lineTo(x,y);ctx.lineTo(x+20,y+40);ctx.lineTo(x+28,h);ctx.fill();ctx.strokeStyle='#74917a22';ctx.stroke();}
+  ctx.save();ctx.translate(cx,h*.13);const ah=h*.72,aw=h*.37;ctx.lineWidth=15;ctx.strokeStyle='#344b40';ctx.beginPath();ctx.moveTo(-aw/2,ah);ctx.lineTo(-aw/2,aw*.6);ctx.quadraticCurveTo(-aw/2,10,0,0);ctx.quadraticCurveTo(aw/2,10,aw/2,aw*.6);ctx.lineTo(aw/2,ah);ctx.stroke();ctx.lineWidth=2;ctx.strokeStyle='#9aaa694a';ctx.stroke();ctx.restore();
+  for(let i=0;i<7;i++){ctx.fillStyle=`rgba(70,87,69,${.22-i*.02})`;ctx.beginPath();ctx.moveTo(cx-100-i*34,h*.79+i*13);ctx.lineTo(cx+100+i*34,h*.79+i*13);ctx.lineTo(cx+130+i*34,h*.82+i*13);ctx.lineTo(cx-130-i*34,h*.82+i*13);ctx.fill();}
+  for(let i=0;i<40;i++){const x=((i*97.31+t*(.08+i%3*.03))%w),y=(h-(i*53+t*(.1+i%4*.02))%h);ctx.fillStyle=`rgba(196,196,128,${.15+.3*Math.sin(i+t*.01)**2})`;ctx.beginPath();ctx.arc(x,y,i%5===0?2:1,0,Math.PI*2);ctx.fill();}
+  t++;if(!reduced&&canvas.isConnected)frame=requestAnimationFrame(render);
+ };render();
+}

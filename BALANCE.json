@@ -1,0 +1,449 @@
+{
+  "note": "Deterministic bots, not human playtests or proof of balance. Tactical policy is intentionally simple; learned combos and coordinated parties may outperform it.",
+  "results": [
+    {
+      "policy": "Attack only",
+      "legacy": "No upgrades",
+      "rows": [
+        {
+          "class": "Guerreiro",
+          "averageStage": 4,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Paladino",
+          "averageStage": 3.1,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Bárbaro",
+          "averageStage": 6,
+          "wins": 3,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Ladino",
+          "averageStage": 3.3,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Patrulheiro",
+          "averageStage": 3.3,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Mago",
+          "averageStage": 2.6,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Necromante",
+          "averageStage": 2.4,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Clérigo",
+          "averageStage": 3.2,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Druida",
+          "averageStage": 2.35,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Bardo",
+          "averageStage": 2.45,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Monge",
+          "averageStage": 3.1,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Bruxo",
+          "averageStage": 2.4,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Alquimista",
+          "averageStage": 2.2,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Xamã",
+          "averageStage": 2.9,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Artífice",
+          "averageStage": 2,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        }
+      ]
+    },
+    {
+      "policy": "Tactical heuristic (knows three formulas)",
+      "legacy": "No upgrades",
+      "rows": [
+        {
+          "class": "Guerreiro",
+          "averageStage": 6.25,
+          "wins": 2,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Paladino",
+          "averageStage": 5.25,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Bárbaro",
+          "averageStage": 14.75,
+          "wins": 18,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Ladino",
+          "averageStage": 14.3,
+          "wins": 15,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Patrulheiro",
+          "averageStage": 12.85,
+          "wins": 10,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Mago",
+          "averageStage": 3.9,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Necromante",
+          "averageStage": 10.85,
+          "wins": 1,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Clérigo",
+          "averageStage": 5.3,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Druida",
+          "averageStage": 5.5,
+          "wins": 1,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Bardo",
+          "averageStage": 7.7,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Monge",
+          "averageStage": 9.7,
+          "wins": 6,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Bruxo",
+          "averageStage": 11.25,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Alquimista",
+          "averageStage": 4.85,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Xamã",
+          "averageStage": 13.25,
+          "wins": 13,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Artífice",
+          "averageStage": 6.15,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        }
+      ]
+    },
+    {
+      "policy": "Attack only",
+      "legacy": "3 levels in each upgrade",
+      "rows": [
+        {
+          "class": "Guerreiro",
+          "averageStage": 5.55,
+          "wins": 2,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Paladino",
+          "averageStage": 4,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Bárbaro",
+          "averageStage": 11.3,
+          "wins": 13,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Ladino",
+          "averageStage": 3.95,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Patrulheiro",
+          "averageStage": 3.7,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Mago",
+          "averageStage": 3.15,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Necromante",
+          "averageStage": 2.75,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Clérigo",
+          "averageStage": 3.3,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Druida",
+          "averageStage": 2.7,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Bardo",
+          "averageStage": 3,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Monge",
+          "averageStage": 3.55,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Bruxo",
+          "averageStage": 2.7,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Alquimista",
+          "averageStage": 2.75,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Xamã",
+          "averageStage": 3.35,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Artífice",
+          "averageStage": 2.1,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        }
+      ]
+    },
+    {
+      "policy": "Tactical heuristic (knows three formulas)",
+      "legacy": "3 levels in each upgrade",
+      "rows": [
+        {
+          "class": "Guerreiro",
+          "averageStage": 6.25,
+          "wins": 1,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Paladino",
+          "averageStage": 5.25,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Bárbaro",
+          "averageStage": 15,
+          "wins": 20,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Ladino",
+          "averageStage": 14.4,
+          "wins": 16,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Patrulheiro",
+          "averageStage": 14.3,
+          "wins": 18,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Mago",
+          "averageStage": 5.4,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Necromante",
+          "averageStage": 14.4,
+          "wins": 2,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Clérigo",
+          "averageStage": 7.35,
+          "wins": 1,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Druida",
+          "averageStage": 6.5,
+          "wins": 3,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Bardo",
+          "averageStage": 10.95,
+          "wins": 4,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Monge",
+          "averageStage": 13.85,
+          "wins": 16,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Bruxo",
+          "averageStage": 14.75,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Alquimista",
+          "averageStage": 5.75,
+          "wins": 0,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Xamã",
+          "averageStage": 14.65,
+          "wins": 15,
+          "runs": 20,
+          "stalled": 0
+        },
+        {
+          "class": "Artífice",
+          "averageStage": 10.55,
+          "wins": 8,
+          "runs": 20,
+          "stalled": 0
+        }
+      ]
+    }
+  ]
+}
