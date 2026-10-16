@@ -71,3 +71,5 @@ export const BASE_ITEMS = [
  ['Couraça','armor','♜',2,3],['Manto','armor','♧',2,2],['Elmo','helm','♛',2,2],['Anel','ring','◉',1,1],['Amuleto','amulet','◇',1,1]
 ];
 export const RARITIES = [{name:'Comum',color:'#9ba4b7',affixes:0},{name:'Mágico',color:'#69b6ff',affixes:1},{name:'Raro',color:'#edc876',affixes:2},{name:'Épico',color:'#be8bfa',affixes:3},{name:'Lendário',color:'#ff9760',affixes:4}];
+
+RARITIES.push({name:'Mítico',color:'#ff638f',affixes:5});

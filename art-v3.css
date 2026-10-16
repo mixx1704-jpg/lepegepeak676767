@@ -1,0 +1,30 @@
+.actor-sprite,.creature-sprite{display:inline-block;position:relative;width:104px;height:104px;vertical-align:bottom;isolation:isolate;overflow:visible;image-rendering:pixelated}
+.atlas-cell{display:block;position:absolute;inset:0;background-repeat:no-repeat;background-size:calc(var(--atlas-cols)*100%) calc(var(--atlas-rows)*100%);background-position:calc(var(--atlas-x)*100%/(var(--atlas-cols) - 1)) calc(var(--atlas-y)*100%/(var(--atlas-rows) - 1));image-rendering:pixelated}
+.actor-body{position:absolute;inset:0;transform-origin:48% 94%}
+.actor-shadow{position:absolute;left:19%;right:15%;height:9%;bottom:0;background:#111d25a0;border-radius:50%;z-index:-1}
+.weapon-arm{position:absolute;left:68%;top:39%;width:33%;height:59%;transform-origin:38% 65%;transform:rotate(-18deg);z-index:2}
+.held-weapon{width:100%;height:100%;overflow:visible;image-rendering:pixelated}
+.weapon-arm[data-weapon="bow"]{left:62%;top:34%;transform:rotate(-5deg)}
+.weapon-arm[data-weapon="gun"]{top:43%;transform:rotate(-30deg)}
+.weapon-arm[data-weapon="fist"]{left:65%;top:36%;width:26%}
+.weapon-trail{position:absolute;width:80%;height:90%;border:5px solid transparent;border-right-color:#f7f1bf;left:60%;top:-12%;border-radius:50%;opacity:0;transform:rotate(-40deg);pointer-events:none}
+.attack-pose .actor-body,.attacking .actor-body{animation:body-strike .7s steps(5) both}
+.attack-pose .weapon-arm,.attacking .weapon-arm{animation:weapon-strike .7s steps(6) both}
+.attack-pose .weapon-trail,.attacking .weapon-trail{animation:sword-trail .7s steps(5) both}
+.cast-pose .actor-body{animation:body-cast .75s steps(5) both}
+.cast-pose .weapon-arm{animation:weapon-cast .75s steps(5) both}
+.cast-pose:after{content:"";position:absolute;inset:15%;border:3px solid #d4e9c4;border-radius:50%;animation:cast-ring .75s ease-out both;pointer-events:none}
+.shoot-pose .actor-body{animation:bow-recoil .65s steps(5) both}
+.shoot-pose .weapon-arm{animation:bow-draw .65s steps(5) both}
+.summon-sprite{width:58px;height:64px}.summon-sprite .atlas-cell{filter:drop-shadow(0 0 3px #99ddae)}
+.creature-sprite.monster-sprite{width:110px;height:110px}
+.dead .actor-body,.dead .atlas-cell{filter:grayscale(1);opacity:.5;transform:rotate(72deg);transform-origin:50% 90%}
+@keyframes body-strike{0%,100%{transform:translate(0,0) rotate(0)}20%{transform:translate(-8px,0) rotate(-9deg)}48%{transform:translate(24px,-3px) rotate(12deg)}66%{transform:translate(28px,0) rotate(8deg)}85%{transform:translate(5px,0) rotate(0)}}
+@keyframes weapon-strike{0%,100%{transform:rotate(-18deg)}25%{transform:rotate(-120deg) translate(-8px,-5px)}45%{transform:rotate(45deg) translate(5px,-3px)}65%{transform:rotate(100deg)}85%{transform:rotate(20deg)}}
+@keyframes sword-trail{0%,30%,90%,100%{opacity:0}40%{opacity:1;transform:rotate(-80deg) scale(.8)}65%{opacity:.8;transform:rotate(65deg) scale(1.2)}}
+@keyframes body-cast{0%,100%{transform:translateY(0)}35%,70%{transform:translateY(-7px)}}
+@keyframes weapon-cast{0%,100%{transform:rotate(-18deg)}30%,75%{transform:rotate(-55deg) translateY(-15px)}}
+@keyframes cast-ring{0%{opacity:0;transform:scale(.3)}30%{opacity:.9}100%{opacity:0;transform:scale(1.8)}}
+@keyframes bow-recoil{0%,100%{transform:translateX(0)}35%{transform:translateX(-5px) rotate(-5deg)}55%{transform:translateX(7px) rotate(3deg)}}
+@keyframes bow-draw{0%,100%{transform:rotate(-5deg)}35%{transform:translateX(-9px) rotate(-10deg)}55%{transform:translateX(6px) rotate(5deg)}}
+@media(prefers-reduced-motion:reduce){.actor-sprite *{animation-duration:.01ms!important;animation-iteration-count:1!important}}

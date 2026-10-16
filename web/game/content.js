@@ -1,3 +1,4 @@
+import {EXTRA_RACES,ECHO_TREE,DEATH_TOUCH} from './expansion.js';
 export const RACES = [
  {id:'humano',name:'Humano',cost:0,color:'#70a9ed',stats:{str:1,dex:1,int:1},desc:'+1 FOR/DES/INT. +5% experiência. Sem fraqueza racial.',xp:.05},
  {id:'anao',name:'Anão',cost:0,color:'#d8a35a',stats:{armor:3,str:2,dex:-2},desc:'+3 armadura, +2 FOR, −2 DES. Escudos recebidos +15%.',shield:.15},
@@ -74,7 +75,7 @@ export const RUNES=RUNE_DATA.map(x=>x.id);
 const forms=[['Lança','hit',1.65,10],['Onda','aoe',1,19],['Sutura','heal',2.2,15],['Hino','partyheal',1.15,24],['Servo','summon',.55,19],['Égide','shield',1.6,14],['Sede','drain',1.4,17],['Martelo','stagger',1.2,16],['Marca','poison',1.25,15],['Pira','burn',1.35,16],['Prisão','freeze',.9,20],['Arco','chain',1.3,23],['Voto','curse',1,18],['Retorno','revive',.25,34]];
 // Ordered spell language. 196 two-rune, 392 three-rune, 392 four-rune formulas.
 // This resolver is shipped for offline play. In online play the server executes it.
-export function resolveSpell(input){
+function legacySpell(input){
  const tokens=String(input||'').trim().toUpperCase().split(/\s+/).filter(Boolean);if(tokens.length<2||tokens.length>4)return null;
  const [i,j]=tokens.slice(0,2).map(t=>RUNES.indexOf(t));if(i<0||j<0)return null;
  const mods=[RUNES[(i+j+3)%14],RUNES[(i+j+8)%14]],m=tokens.length>=3?mods.indexOf(tokens[2]):-1;
@@ -83,3 +84,17 @@ export function resolveSpell(input){
  return {combo:tokens.join(' '),name:`${f[0]} de ${RUNE_DATA[i].name}${tier>1?(m===0?' Voraz':' Persistente'):''}${tier===3?': Absoluto':''}`,kind:f[1],type:RUNE_DATA[i].type,cost,power:f[2]*boost,tier,duration:2+(tier>1&&m===1?2:0),element:RUNES[i]};
 }
 export function randomFormula(s,rng){const i=Math.floor(rng(s)*14),j=Math.floor(rng(s)*14),tokens=[RUNES[i],RUNES[j]];if(rng(s)>.6)tokens.push(RUNES[(i+j+3)%14]);return resolveSpell(tokens.join(' '));}
+
+RACES.push(...EXTRA_RACES);
+const raceSpecial={humano:{},anao:{S:2,E:2,A:-2,C:-1},elfo:{I:3,P:1,E:-2},orc:{S:4,I:-3,C:-2},umbriano:{A:3,E:-2},infernal:{I:2,E:-1},revenante:{E:2,C:-2},forjado:{E:3,A:-2},astral:{I:4,E:-3},draconico:{S:2,E:2,C:-2}};
+for(const r of RACES){r.special??=raceSpecial[r.id]||{};if(r.id==='humano'){r.xp=.12;r.stats.armor=-2;r.desc='+12% XP; −2 armadura. Adaptável, mas vulnerável.';}if(r.id==='elfo')r.stats.contundente=-30;if(r.id==='orc')r.discount=-.2;}
+UPGRADES.splice(0,UPGRADES.length,...ECHO_TREE.flatMap(b=>b.nodes));
+for(const [key,name,req] of [['S','Potência','str'],['P','Precisão','dex'],['E','Tenacidade','vit'],['C','Inspiração','int'],['I','Estudo','int'],['A','Movimento','dex'],['L','Fortuna','dex']])for(let tier=1;tier<=4;tier++)TALENTS.push({id:'special_'+key+'_'+tier,name:name+' '+['I','II','III','IV'][tier-1],tree:'S.P.E.C.I.A.L.',rarity:['Comum','Raro','Épico','Lendário'][tier-1],req:{[key]:tier*3+2},prereq:tier>1?['special_'+key+'_'+(tier-1)]:[],excludes:[],desc:({S:'+8% potência de dano',P:'+4% crítico',E:'+15 vida e +1 armadura',C:'+12% cura e dano de servos',I:'+10% XP e +8 mana',A:'−4% tempo de recuperação',L:'+5 qualidade de loot'})[key],specialKey:key});
+export function resolveSpell(input){
+ const tokens=String(input||'').trim().toUpperCase().split(/\s+/).filter(Boolean);if(tokens.length<2||tokens.length>12||tokens.some(t=>!RUNES.includes(t)))return null;
+ const combo=tokens.join(' ');if(combo===DEATH_TOUCH)return {combo,name:'DEATH TOUCH',kind:'death',type:'sombrio',cost:100,power:8,tier:11,duration:1,element:'UMBRA'};
+ if(tokens.length<=4)return legacySpell(combo);
+ const i=RUNES.indexOf(tokens[0]),j=RUNES.indexOf(tokens[1]),f=forms[j],n=tokens.length;
+ const distinct=new Set(tokens).size,boost=1+(n-2)*.18+distinct*.025;
+ return {combo,name:`${f[0]} de ${RUNE_DATA[i].name} · Círculo ${n}`,kind:f[1],type:RUNE_DATA[i].type,cost:Math.ceil(f[3]*(1+(n-2)*.2)),power:f[2]*boost,tier:n-1,duration:Math.min(7,2+Math.floor(n/3)),element:tokens[0]};
+}
