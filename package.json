@@ -1,12 +1,13 @@
 {
   "name": "abismo-dos-ecos",
-  "version": "4.0.0",
+  "version": "6.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/inferno.test.mjs tests/atb.test.mjs tests/art.test.mjs tests/expansion.test.mjs tests/revisao-v4.test.mjs",
+    "test": "node --test tests/*.test.mjs",
     "preview": "node tools/serve.mjs",
     "sync": "node tools/sync.mjs",
-    "balance": "node tools/balance.mjs"
+    "balance": "node tools/balance.mjs",
+    "benchmark": "node tools/benchmark.mjs"
   }
 }

@@ -1,3 +1,5 @@
+import {drawCreature} from './creature-art.js';
+import {tungPixels} from './tung-art.js';
 import {CLASSES} from './game/data.js';
 const cache=new Map();
 const raceColors={humano:['#efb780','#ffd5a1','#a86c51'],anao:['#d99a6c','#f4bf86','#96523d'],elfo:['#f7cfac','#ffe6c5','#bc907d'],orc:['#6e9b59','#a2c87a','#405f3e'],umbriano:['#9283bd','#b5a4dc','#5d537f'],infernal:['#c46b61','#e69778','#753d4c'],revenante:['#a7bbad','#d9e0c2','#607c77'],forjado:['#8c9a9d','#d5d7bd','#4c6169'],astral:['#a3c4d9','#e1ebec','#6a86b2'],draconico:['#b68c56','#e3b269','#785c43'],goblin:['#7d9e51','#b2c578','#49643f'],saurio:['#6eac84','#a9d49a','#456b68'],silfide:['#b9d9cf','#edf3ce','#779fa8'],ogro:['#8b9e6a','#b5bf88','#596747'],vampiro:['#cdc1be','#f1dcd1','#968a9e'],fungo:['#b6b07c','#e8d69b','#77794f'],kitsune:['#e9b583','#ffdcaa','#b07755'],abissal:['#697f9d','#a5b6c3','#3d4c70']};
@@ -6,6 +8,7 @@ const hairs=['#a9452f','#e8bc58','#684c39','#abb4c5','#ad663a','#78523d','#c6c6b
 function board(w=32,h=48){const pixels=Array.from({length:h},()=>Array(w).fill(null));return {w,h,pixels,rect(x,y,a,b,c){for(let j=Math.max(0,Math.round(y));j<Math.min(h,Math.round(y+b));j++)for(let i=Math.max(0,Math.round(x));i<Math.min(w,Math.round(x+a));i++)pixels[j][i]=c;},dot(x,y,c){this.rect(x,y,1,1,c)}};}
 function uri(b){let nodes='';for(let y=0;y<b.h;y++){let x=0;while(x<b.w){const color=b.pixels[y][x];let end=x+1;while(end<b.w&&b.pixels[y][end]===color)end++;if(color)nodes+=`<rect x="${x}" y="${y}" width="${end-x}" height="1" fill="${color}"/>`;x=end;}}return 'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${b.w}" height="${b.h}" viewBox="0 0 ${b.w} ${b.h}" shape-rendering="crispEdges">${nodes}</svg>`);}
 export function heroPixels(classId='guerreiro',raceId='humano',pose='idle'){
+ if(classId==='tung')return tungPixels(pose);
  const key=`hero:${classId}:${raceId}:${pose}`;if(cache.has(key))return cache.get(key);
  const b=board(),i=Math.max(0,CLASSES.findIndex(c=>c.id===classId)),[skin,light,shade]=raceColors[raceId]||raceColors.humano,[coat,hi,dark,trim]=clothes[i],hair=hairs[i],ink='#242b37';
  const short=['anao','goblin','fungo'].includes(raceId),broad=['ogro','orc','forjado'].includes(raceId),slim=['elfo','silfide','astral'].includes(raceId);const off=short?6:0,top=off+(pose==='step'?1:0),wide=broad?2:slim?-1:0;
@@ -53,38 +56,7 @@ export function heroPixels(classId='guerreiro',raceId='humano',pose='idle'){
  if(raceId==='silfide'){r(4,24,3,7,'#97b9c5');r(3,23,2,4,'#c7d9cf');r(26,24,3,7,'#97b9c5');r(28,23,2,4,'#c7d9cf');}
  const result=uri(b);cache.set(key,result);return result;
 }
-export function creaturePixels(kind='skeleton',variant=0,boss=false){const key=`mob:${kind}:${variant}:${boss}`;if(cache.has(key))return cache.get(key);const b=board(48,48),ink='#29313c',pal=[['#cbc7a1','#eee0b9','#898b77'],['#719262','#b0be7d','#46644f'],['#9a6b68','#d49b83','#644756'],['#7c8ca9','#b6d4d5','#505c81'],['#a28854','#dcc07a','#6d5742'],['#8a6393','#bf94b3','#514366']][Math.abs(variant)%6],[base,hi,shade]=pal;const r=(...a)=>b.rect(...a);const animal=/wolf|lobo|aranha|spider|fera|javali/.test(kind),plant=/treant|ent|totem|homunculus/.test(kind),machine=/turret|golem/.test(kind);
- if(animal){r(9,23,28,13,ink);r(10,24,26,10,base);r(11,24,20,4,hi);r(5,16,15,15,ink);r(6,17,13,12,base);r(3,23,8,6,base);r(7,12,4,8,shade);r(17,12,4,8,shade);r(8,20,3,2,'#eac57a');r(16,20,3,2,'#eac57a');for(let i=0;i<4;i++){r(10+i*7,34,3,9,ink);r(11+i*7,34,2,7,shade);}r(35,16,4,13,base);r(38,14,3,6,hi);if(/aranha|spider/.test(kind))for(let i=0;i<4;i++){r(3,26+i*4,10,2,shade);r(35,26+i*4,10,2,shade);r(2+i,27+i*4,2,8,ink);r(43-i,27+i*4,2,8,ink);}}
- else{r(14,35,7,10,ink);r(28,35,7,10,ink);r(15,35,5,8,shade);r(29,35,5,8,base);r(11,20,27,18,ink);r(12,21,25,15,shade);r(15,22,18,13,base);r(16,22,6,10,hi);r(7,22,7,14,ink);r(8,23,5,11,base);r(36,23,6,13,ink);r(37,24,4,11,base);r(15,5,19,16,ink);r(16,6,17,14,base);r(18,6,8,8,hi);r(17,12,5,4,ink);r(27,12,5,4,ink);r(19,13,2,2,'#e3b864');r(28,13,2,2,'#e3b864');r(22,18,6,1,shade);
- if(/skeleton|archer|knight|lich/.test(kind)){r(19,19,2,3,hi);r(23,19,2,3,hi);r(28,19,2,3,hi);r(23,26,2,8,hi);for(let y=25;y<34;y+=3)r(18,y,13,1,hi);}
- if(/knight|golem/.test(kind)){r(14,7,21,7,shade);r(17,5,16,6,base);r(19,11,12,2,ink);r(23,11,3,2,'#c5d4bf');r(10,21,10,6,hi);r(31,21,10,6,hi);r(17,25,16,7,shade);}
- if(/archer|turret/.test(kind)){r(38,11,3,26,shade);r(42,15,2,19,hi);r(40,12,3,3,hi);r(40,34,3,3,hi);r(27,25,16,2,hi);}
- if(plant){r(10,5,6,8,shade);r(6,3,6,4,base);r(34,4,5,10,shade);r(38,2,6,4,base);r(18,2,13,5,hi);r(20,31,3,11,shade);r(29,28,3,13,shade);}
- if(/imp|demon|infernal/.test(kind)||boss){r(12,2,4,8,shade);r(10,0,3,6,hi);r(33,1,4,9,shade);r(37,0,3,5,hi);r(4,19,5,13,shade);r(0,17,5,5,base);r(41,20,5,13,shade);r(44,18,4,5,base);}
- if(/spirit/.test(kind)){r(12,37,26,6,shade);r(16,42,19,3,base);r(21,45,9,2,hi);}
- if(machine){r(18,28,14,3,ink);r(23,26,5,7,'#dcb66b');r(16,7,16,3,hi);}
- }
- // Cloth silhouettes have stepped hems, a face and articulated arms, not square torsos.
- if(!animal&&/lich|witch|shaman|priest|oracle|brood|leech/.test(kind)){
-  for(const row of b.pixels)row.fill(null);
-  const robe=kind==='witch'?'#637ea0':kind==='shaman'?'#7d698d':kind==='priest'?'#9e7955':shade;
-  const robeHi=kind==='witch'?'#aac6d1':kind==='shaman'?'#bca3b3':hi;
-  for(let y=21;y<43;y++){const spread=Math.floor((y-21)/5);r(16-spread,y,16+spread*2,1,ink);r(17-spread,y,14+spread*2,1,robe);r(18-spread,y,3,1,robeHi);r(28+spread,y,2,1,shade);}
-  r(14,9,20,13,ink);r(16,10,16,11,robe);r(18,11,12,10,'#c8bea0');r(19,12,6,6,'#e4d2ae');r(19,15,3,3,ink);r(27,15,3,3,ink);r(20,15,1,1,'#d2b86e');r(28,15,1,1,'#d2b86e');r(23,20,4,1,shade);
-  r(12,24,6,11,ink);r(13,24,4,8,robe);r(11,31,5,4,'#c8bea0');r(30,23,7,11,ink);r(31,24,5,8,robe);r(34,31,5,4,'#c8bea0');r(23,23,3,18,robeHi);r(24,24,1,16,'#dfcaa0');r(18,40,13,2,robeHi);r(20,43,5,2,ink);r(29,43,5,2,ink);
-  r(39,12,3,32,ink);r(40,13,1,30,'#bb945f');r(36,9,9,5,ink);r(37,10,7,3,robeHi);r(39,6,3,8,robeHi);r(40,7,1,4,'#e6e0bb');
-  if(kind==='witch'){r(10,8,27,3,ink);r(11,8,25,1,robeHi);r(15,5,19,4,robe);r(19,2,12,5,robe);r(23,0,7,3,robeHi);}
-  else if(kind==='shaman'){r(15,6,4,5,'#bcac84');r(12,3,3,5,'#bcac84');r(31,6,4,5,'#bcac84');r(35,3,3,5,'#bcac84');r(19,8,12,3,robeHi);r(21,24,7,3,base);}
-  else{r(15,5,18,6,ink);r(17,4,14,4,robe);r(20,2,8,3,robe);r(14,10,4,12,robe);r(31,10,4,12,robe);r(18,7,12,1,robeHi);}
- }
- if(!animal&&/skeleton|ghoul|executioner|duelist/.test(kind)){
-  for(const row of b.pixels)row.fill(null);
-  r(19,7,14,12,ink);r(18,10,16,7,ink);r(20,8,12,10,base);r(21,8,6,3,hi);r(21,12,4,3,ink);r(28,12,4,3,ink);r(23,17,7,4,base);r(24,18,1,2,ink);r(27,18,1,2,ink);r(30,18,1,2,ink);
-  r(23,21,4,14,ink);r(24,21,2,13,hi);for(let y=23;y<32;y+=3){r(17,y,16,2,ink);r(18,y,14,1,base);}r(15,23,4,12,ink);r(16,24,2,10,hi);r(31,23,4,12,ink);r(32,24,2,10,base);r(14,34,5,4,base);r(32,34,5,4,base);r(19,34,13,4,shade);r(20,37,4,7,ink);r(21,38,2,5,base);r(29,37,4,7,ink);r(30,38,2,5,base);r(18,43,7,3,shade);r(29,43,7,3,shade);
-  if(kind==='duelist'){r(16,21,18,4,shade);r(17,25,4,9,base);r(31,24,3,14,shade);r(17,5,16,4,shade);}
-  r(39,19,3,17,ink);r(40,17,1,17,hi);r(36,33,9,2,shade);r(39,35,3,5,ink);
- }
- if(variant%3===1){r(10,19,5,4,shade);r(35,19,5,4,shade);}if(variant%3===2){r(21,2,5,5,hi);r(22,0,3,2,base);}const family=Math.floor(Math.abs(variant)/6)%4;if(family===1){r(12,4,24,3,shade);r(11,7,4,14,shade);r(33,7,4,14,shade);}if(family===2){r(3,25,10,13,ink);r(4,26,8,10,base);r(6,27,2,7,hi);r(4,30,8,2,hi);}if(family===3){r(16,3,18,3,hi);r(17,0,3,5,base);r(23,0,3,5,base);r(29,0,3,5,base);r(21,27,8,2,hi);r(24,24,2,8,hi);}const out=uri(b);cache.set(key,out);return out;}
+export const creaturePixels=drawCreature;
 export const PIXEL_RACES=Object.keys(raceColors);
 
 export const raceHand=id=>(raceColors[id]||raceColors.humano)[0];
@@ -93,6 +65,7 @@ export function weaponPixels(kind='sword',rarity=0){const key=`weapon:${kind}:${
  r(6,21,4,10,ink);r(7,22,2,8,wood);r(7,24,2,1,gold);r(7,28,2,1,gold);
  if(['sword','dagger','spear'].includes(kind)){const top=kind==='dagger'?11:kind==='spear'?0:2;r(6,top+2,4,20-top,ink);r(7,top+1,2,21-top,steel);r(7,top+2,1,18-top,edge);r(8,top+3,1,18-top,shade);r(4,21,8,3,ink);r(4,21,8,1,gold);r(7,22,2,1,gem);if(kind==='spear'){r(7,11,2,12,wood);r(5,5,6,5,steel);r(7,0,2,5,edge);}}
  if(kind==='axe'){r(6,4,4,20,ink);r(7,5,2,19,wood);r(2,3,12,10,ink);r(1,5,14,7,ink);r(2,5,12,6,steel);r(2,5,2,6,edge);r(12,5,2,6,shade);r(5,5,6,6,shade);r(7,6,2,5,gold);}
+ if(kind==='tungbat'){r(5,2,7,18,ink);r(4,4,9,12,ink);r(5,3,7,14,wood);r(5,4,2,12,'#cfa366');r(10,4,2,12,'#6b4d35');r(6,17,5,6,wood);r(7,22,2,8,'#ad8050');r(6,29,4,2,wood);}
  if(kind==='club'){r(4,2,8,19,ink);r(3,4,10,12,ink);r(4,4,8,13,wood);r(5,3,2,15,'#c39a60');r(9,4,2,14,'#604c39');r(4,6,8,2,gold);r(4,14,8,2,gold);}
  if(kind==='staff'){r(6,8,4,17,ink);r(7,9,2,15,wood);r(3,1,10,11,ink);r(4,2,8,8,gold);r(5,3,6,6,gem);r(6,3,2,2,edge);r(6,10,4,2,gold);}
  if(kind==='scythe'){r(6,3,4,21,ink);r(7,5,2,20,wood);r(6,2,9,4,ink);r(10,4,6,9,ink);r(7,3,7,2,steel);r(13,5,2,7,steel);r(15,8,1,6,shade);r(7,3,7,1,edge);}

@@ -1,3 +1,4 @@
+import {DEEP_TALENTS} from './deep-content.js';
 import {EXTRA_RACES,ECHO_TREE,DEATH_TOUCH} from './expansion.js';
 export const RACES = [
  {id:'humano',name:'Humano',cost:0,color:'#70a9ed',stats:{str:1,dex:1,int:1},desc:'+1 FOR/DES/INT. +5% experiência. Sem fraqueza racial.',xp:.05},
@@ -90,6 +91,7 @@ const raceSpecial={humano:{},anao:{S:2,E:2,A:-2,C:-1},elfo:{I:3,P:1,E:-2},orc:{S
 for(const r of RACES){r.special??=raceSpecial[r.id]||{};if(r.id==='humano'){r.xp=.12;r.stats.armor=-2;r.desc='+12% XP; −2 armadura. Adaptável, mas vulnerável.';}if(r.id==='elfo')r.stats.contundente=-30;if(r.id==='orc')r.discount=-.2;}
 UPGRADES.splice(0,UPGRADES.length,...ECHO_TREE.flatMap(b=>b.nodes));
 for(const [key,name,req] of [['S','Potência','str'],['P','Precisão','dex'],['E','Tenacidade','vit'],['C','Inspiração','int'],['I','Estudo','int'],['A','Movimento','dex'],['L','Fortuna','dex']])for(let tier=1;tier<=4;tier++)TALENTS.push({id:'special_'+key+'_'+tier,name:name+' '+['I','II','III','IV'][tier-1],tree:'S.P.E.C.I.A.L.',rarity:['Comum','Raro','Épico','Lendário'][tier-1],req:{[key]:tier*3+2},prereq:tier>1?['special_'+key+'_'+(tier-1)]:[],excludes:[],desc:({S:'+8% potência de dano',P:'+4% crítico',E:'+15 vida e +1 armadura',C:'+12% cura e dano de servos',I:'+10% XP e +8 mana',A:'−4% tempo de recuperação',L:'+5 qualidade de loot'})[key],specialKey:key});
+TALENTS.push(...DEEP_TALENTS);
 export function resolveSpell(input){
  const tokens=String(input||'').trim().toUpperCase().split(/\s+/).filter(Boolean);if(tokens.length<2||tokens.length>12||tokens.some(t=>!RUNES.includes(t)))return null;
  const combo=tokens.join(' ');if(combo===DEATH_TOUCH)return {combo,name:'DEATH TOUCH',kind:'death',type:'sombrio',cost:100,power:8,tier:11,duration:1,element:'UMBRA'};

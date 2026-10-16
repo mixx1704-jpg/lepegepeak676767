@@ -1,3 +1,4 @@
+import {isRepeatedCommand} from './shared/combat-state.js';
 import {prepareAccount} from './shared/account.js';
 import {createClient} from 'npm:@supabase/supabase-js@2.57.4';
 import {createRoom,addPlayer,applyAction,emptyMeta,upgradeMeta,unlockRace,normalizeMeta} from './shared/engine.js';
@@ -63,9 +64,11 @@ Deno.serve(async req=>{
   }
   const rid=p.active_room;if(!rid)throw new Error('Você não está em uma sala.');
   if(op==='leave'){checked(await admin.rpc('leave_game',{pid:p.id,rid}));return response({ok:true});}
+  if(op==='sync'&&Number.isInteger(body.revision)){const head=checked(await admin.from('rooms').select('revision').eq('id',rid).single());if(head.revision===body.revision)return response({unchanged:true,revision:head.revision});}
   const room=checked(await admin.from('rooms').select('*').eq('id',rid).single());
   if(op==='sync')return response({room});
   if(op==='action'){
+   if(isRepeatedCommand(room.state,p.id,body.action?.clientActionId))return response({room});
    if(body.revision!==room.revision)return response({error:'A partida mudou. Tente a ação novamente.',room,conflict:true},409);
    const state=applyAction(room.state,p.id,body.action);
    const result=await admin.rpc('commit_game',{rid,expected:room.revision,game_state:state});

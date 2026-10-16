@@ -1,0 +1,65 @@
+{
+  "note": "Somente custo do motor local, sem rede ou renderização. Medido nesta máquina; não garante latência de Supabase. Inimigos com vida ampliada e escudos para sustentar 300 ações de defesa por cenário.",
+  "runs": [
+    {
+      "scenario": "20 personagens iniciais",
+      "actions": 300,
+      "players": 20,
+      "meanMs": 2.127982333333336,
+      "p50Ms": 1.5120999999999185,
+      "p95Ms": 5.792699999999968,
+      "maximumMs": 8.478200000000015,
+      "fxHistory": 96
+    },
+    {
+      "scenario": "20 personagens iniciais",
+      "actions": 300,
+      "players": 20,
+      "meanMs": 2.163878000000012,
+      "p50Ms": 1.620600000000195,
+      "p95Ms": 5.100100000000566,
+      "maximumMs": 8.192599999999857,
+      "fxHistory": 96
+    },
+    {
+      "scenario": "20 personagens iniciais",
+      "actions": 300,
+      "players": 20,
+      "meanMs": 1.8720723333333231,
+      "p50Ms": 1.4718999999995503,
+      "p95Ms": 3.9399999999996,
+      "maximumMs": 6.584100000000035,
+      "fxHistory": 96
+    },
+    {
+      "scenario": "20 ultras / 50 talentos por personagem",
+      "actions": 300,
+      "players": 20,
+      "meanMs": 6.080134999999979,
+      "p50Ms": 5.882399999999507,
+      "p95Ms": 9.063000000000102,
+      "maximumMs": 13.485599999999977,
+      "fxHistory": 96
+    },
+    {
+      "scenario": "20 ultras / 50 talentos por personagem",
+      "actions": 300,
+      "players": 20,
+      "meanMs": 5.775903999999992,
+      "p50Ms": 5.29910000000018,
+      "p95Ms": 8.488899999999376,
+      "maximumMs": 10.718899999999849,
+      "fxHistory": 96
+    },
+    {
+      "scenario": "20 ultras / 50 talentos por personagem",
+      "actions": 300,
+      "players": 20,
+      "meanMs": 6.7489900000000125,
+      "p50Ms": 6.372499999999491,
+      "p95Ms": 10.795200000000477,
+      "maximumMs": 13.922600000001694,
+      "fxHistory": 96
+    }
+  ]
+}
