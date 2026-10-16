@@ -5,7 +5,7 @@ import {createRoom,addPlayer,applyAction,emptyMeta,upgradeMeta,unlockRace,normal
 
 const admin=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 const cors={'Access-Control-Allow-Origin':Deno.env.get('SITE_ORIGIN')||'*','Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type','Access-Control-Allow-Methods':'POST, OPTIONS'};
-const response=(body:unknown,status=200)=>new Response(JSON.stringify(body),{status,headers:{...cors,'Content-Type':'application/json','Cache-Control':'no-store'}});
+const response=(body:unknown,status=200)=>new Response(JSON.stringify({...(body as Record<string,unknown>),serverNow:Date.now()}),{status,headers:{...cors,'Content-Type':'application/json','Cache-Control':'no-store'}});
 function checked(result:any){if(result.error)throw new Error(result.error.message);return result.data;}
 function token(){return Array.from(crypto.getRandomValues(new Uint8Array(24)),b=>b.toString(16).padStart(2,'0')).join('');}
 async function hash(code:string){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(code.trim().toLowerCase().replace(/[^a-f0-9]/g,'')))),b=>b.toString(16).padStart(2,'0')).join('');}

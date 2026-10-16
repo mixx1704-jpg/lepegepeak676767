@@ -1,4 +1,4 @@
-import {animateAttack} from './art-v3.js?v=6';
+import {animateAttack} from './art-v3.js?v=7';
 const motions=new WeakMap(),esc=s=>CSS.escape(String(s));
 const colors={fogo:'#fca264',gelo:'#acdceb',eletrico:'#efde91',veneno:'#aaca80',sombrio:'#b39acb',sagrado:'#efdda6',arcano:'#aac3de',corte:'#eee1bd',contundente:'#d9b58b',perfurante:'#d7d5b8'};
 export class BattleEffects{
