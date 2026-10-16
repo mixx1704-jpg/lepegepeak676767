@@ -1,7 +1,8 @@
+import {weaponPixels,raceHand,heroPixels,creaturePixels} from './pixel-sprites.js';
 import {CLASSES} from './game/data.js';
-import {itemIcon as oldIcon,scene as fallbackScene} from './pixel-art.js';
+import {itemIcon as oldIcon} from './pixel-art.js';
 
-const asset = name => new URL(`./assets/${name}`,import.meta.url).href;
+
 const clean = value => String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const plain = text => String(text||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 export function weaponKind(p={}) {
@@ -23,29 +24,13 @@ export function weaponKind(p={}) {
  return ({patrulheiro:'bow',arqueiro:'bow',ladino:'dagger',barbaro:'axe',monge:'fist',artifice:'gun',mago:'staff',necromante:'staff',clerigo:'staff',druida:'staff',bruxo:'staff',xama:'staff',alquimista:'flask',bardo:'lute'})[p.classId||p.class]||'sword';
 }
 // Equipment is a separate rigid pixel layer, pivoting at the character's hand.
-const weapons={
- scythe:'M12 8h4v32h-4z M12 6h13v4h6v14h-4V14h-7v-3h-8z',
- book:'M3 9h12l2 3 2-3h11v26H19l-2 3-2-3H3z',
- crossbow:'M14 6h4v34h-4z M2 10h28v4H2z M2 5h3v16H2z M27 5h3v16h-3z',
- sword:'M12 2h4v26h-4z M8 26h12v3H8z M12 29h4v9h-4z',
- dagger:'M12 13h4v14h-4z M9 27h10v3H9z M12 30h4v8h-4z',
- spear:'M13 1h2v4h3v8h-3v27h-2V13h-3V5h3z',
- axe:'M13 7h4v33h-4z M5 4h7v3h9V4h6v17h-6v-3H12v3H5z',
- club:'M11 18h6v22h-6z M7 2h14v21H7z',
- staff:'M12 12h4v28h-4z M7 3h14v11H7z M10 0h8v3h-8z',
- bow:'M9 1h5v3h4v4h4v5h3v15h-3v5h-4v4h-4v3H9v-4h4v-5h4V10h-4V5H9z M8 2h1v37H8z',
- gun:'M2 13h25v8H12v13H5V21H2z M24 15h8v4h-8z',
- fist:'M7 18h15v13H7z M9 14h3v8H9z M14 13h3v9h-3z M19 15h3v7h-3z',
- flask:'M10 10h10v5h-2v5h5v14H7V20h5v-5h-2z',
- lute:'M12 3h5v17h5v15H7V20h5z'
-};
-function weapon(p){const kind=weaponKind(p),color=['club','bow','staff','lute'].includes(kind)?'#b8864e':kind==='flask'?'#6bccb0':'#dce5da';return `<span class="weapon-arm" data-weapon="${kind}"><svg class="held-weapon" viewBox="0 0 32 42" shape-rendering="crispEdges" aria-hidden="true"><path d="${weapons[kind]}" fill="${color}" stroke="#27252d" stroke-width="2"/><path d="M13 5h2v16h-2z" fill="${kind==='staff'?'#b7eefd':'#f2d895'}"/><path d="M11 29h7v6h-7z" fill="#d9a679" stroke="#453a37"/></svg></span>`;}
-function frame(index,cols,src,extra=''){return `<span class="atlas-cell ${extra}" style="--atlas-cols:${cols};--atlas-rows:3;--atlas-x:${index%cols};--atlas-y:${Math.floor(index/cols)};background-image:url('${asset(src)}')"></span>`;}
-export function heroSprite(p={}){const index=Math.max(0,CLASSES.findIndex(c=>c.id===(p.classId||p.class||'guerreiro')));return `<span class="pixel-sprite hero-sprite actor-sprite" data-class="${clean(p.classId||p.class)}" data-weapon="${weaponKind(p)}" aria-hidden="true"><span class="actor-shadow"></span><span class="actor-body">${frame(index,5,'heroes-atlas.png','hero-cell')}${weapon(p)}</span><span class="weapon-trail"></span></span>`;}
-export function monsterSprite(e={}){const name=plain(e.name),type=e.type||e.damageType,role=e.role||e.kind;let i=0;if(e.boss)i=type==='veneno'?10:type==='fogo'?9:11;else if(/aranha|spider/.test(name)||role==='assassin')i=4;else if(/javali|ogro|troll|fera/.test(name)||type==='contundente')i=5;else if(/arqueiro|atirador/.test(name))i=1;else if(/cavaleiro|knight/.test(name))i=2;else if(type==='gelo')i=6;else if(role==='healer'||type==='veneno')i=7;else if(type==='fogo')i=8;else if(role==='caster')i=11;return `<span class="pixel-sprite monster-sprite creature-sprite" aria-hidden="true"><span class="actor-shadow"></span>${frame(i,4,'creatures-atlas.png')}</span>`;}
-export function summonSprite(pet={}){const name=plain(pet.name||pet.id||pet.kind),i=/arq|archer/.test(name)?1:/cavaleiro|knight|guard/.test(name)?2:/lobo|wolf|espirito|spirit/.test(name)?3:/demon|infernal|impio/.test(name)?8:/ent|totem|homunculo/.test(name)?7:/automato|torreta/.test(name)?2:/lich/.test(name)?11:0;return `<span class="pixel-sprite summon-sprite creature-sprite" aria-hidden="true"><span class="actor-shadow"></span>${frame(i,4,'creatures-atlas.png')}</span>`;}
-export function itemIcon(slot,rarity,name){if(slot==='weapon'){const kind=weaponKind({equipment:{weapon:{name}},classId:'guerreiro'});return `<svg class="item-icon" viewBox="0 0 32 42" shape-rendering="crispEdges" aria-hidden="true"><path d="${weapons[kind]}" fill="${['#b5bdb3','#8ebbd1','#dfc582','#bea3d9','#dfa46c','#ec8da0'][rarity||0]}" stroke="#283431" stroke-width="2"/></svg>`;}return oldIcon(slot,Math.min(4,rarity||0),name);}
+function weapon(p){const kind=weaponKind(p);return `<span class="weapon-arm" data-weapon="${kind}"><img class="held-weapon" src="${weaponPixels(kind,p.equipment?.weapon?.rarity||0)}" alt="" draggable="false"></span>`;}
 
-let background;
-export function battleScene(canvas,stage=1){if(!canvas)return;const draw=()=>{if(!canvas.isConnected)return;canvas.width=1280;canvas.height=720;const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;ctx.drawImage(background,0,0,1280,720);if(Number(stage)>25){ctx.fillStyle=Number(stage)%3===0?'#3c12332b':'#10182718';ctx.fillRect(0,0,1280,720);}};if(background?.complete&&background.naturalWidth){draw();return;}fallbackScene(canvas);if(!background){background=new Image();background.src=asset('temple-battlefield.png');}background.addEventListener('load',draw,{once:true});}
+export function heroSprite(p={}){const c=p.classId||p.class||'guerreiro',race=p.raceId||'humano';return `<span class="pixel-sprite hero-sprite actor-sprite" data-class="${clean(c)}" data-race="${clean(race)}" style="--hand:${raceHand(race)}" data-weapon="${weaponKind(p)}" aria-hidden="true"><span class="actor-shadow"></span><span class="actor-body">${['idle','step','strike','cast'].map(pose=>`<img class="sprite-frame frame-${pose}" src="${heroPixels(c,race,pose)}" alt="" draggable="false">`).join('')}${weapon(p)}</span><span class="weapon-trail"></span></span>`;}
+export function monsterSprite(e={}){const kinds=['skeleton','witch','spider','priest','ghoul','witch','knight','executioner','leech','brood','mimic','shaman','imp','wolf','knight','lich','oracle','treant','duelist','tyrant','imp','brood','archer','priest'];const kind=e.boss?'infernal':kinds[e.species]||'skeleton';return `<span class="pixel-sprite monster-sprite creature-sprite" aria-hidden="true"><span class="actor-shadow"></span><img class="creature-image" src="${creaturePixels(kind,e.species??(['veneno','fogo','sombrio'].indexOf(e.type)+1)*3,!!e.boss)}" alt="" draggable="false"></span>`;}
+
+export function summonSprite(pet={}){return `<span class="pixel-sprite summon-sprite creature-sprite" aria-hidden="true"><span class="actor-shadow"></span><img class="creature-image" src="${creaturePixels(pet.kind||'skeleton',0)}" alt="" draggable="false"></span>`;}
+export function itemIcon(slot,rarity,name){if(slot==='weapon')return `<img class="item-icon" src="${weaponPixels(weaponKind({equipment:{weapon:{name}},classId:'guerreiro'}),rarity||0)}" alt="" draggable="false">`;return oldIcon(slot,Math.min(4,rarity||0),name);}
+
+export function battleScene(canvas,stage=1){if(!canvas)return;canvas.width=320;canvas.height=180;const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;const box=c.fillRect.bind(c);c.fillRect=(x,y,w,h)=>box(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));let seed=19+Math.floor(stage/5);const rnd=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};const crypt=Math.floor((stage-1)/5)%4===1,base=crypt?'#686c65':'#78834c',shade=crypt?'#525d57':'#63713e',light=crypt?'#82877b':'#8c945b';c.fillStyle=base;c.fillRect(0,0,320,180);for(let i=0;i<1600;i++){c.fillStyle=rnd()<.5?shade:light;c.fillRect(Math.floor(rnd()*160)*2,Math.floor(rnd()*90)*2,2+rnd()*2,1);}c.fillStyle=crypt?'#394d4a':'#3d5941';c.fillRect(0,0,320,37);for(let x=0;x<320;x+=18){c.fillStyle='#354740';c.fillRect(x,0,17,32);c.fillStyle='#75816a';c.fillRect(x,27,16,5);c.fillStyle='#a5a17a';c.fillRect(x,27,14,1);c.fillStyle='#53634e';c.fillRect(x+2,3,2,22);}for(let i=0;i<13;i++){const x=i*27-10,y=i%2?5:-7;c.fillStyle='#263e39';c.fillRect(x+9,y+8,7,44);c.fillStyle='#796b49';c.fillRect(x+11,y+16,4,36);for(let j=0;j<4;j++){c.fillStyle=['#304f3c','#3d6544','#52794a','#65884c'][j];c.fillRect(x+5+j,y+j*3,18-j*2,13);c.fillRect(x+1+j,y+4+j*3,26-j*2,6);c.fillRect(x+8+j,y-2+j*3,12-j,4);}c.fillStyle='#92a05b';c.fillRect(x+8,y+12,4,2);c.fillRect(x+16,y+7,5,1);c.fillStyle='#3d5f3d';c.fillRect(x+4,y+20,6,3);}c.fillStyle='#8d8c63';for(let i=0;i<9;i++){const x=48+i*28;c.fillRect(x,151+(i%2)*5,21,6);c.fillStyle='#656e50';c.fillRect(x,156+(i%2)*5,21,2);c.fillStyle='#8d8c63';}for(let i=0;i<13;i++){const x=Math.floor(rnd()*300)+10,y=50+Math.floor(rnd()*90);c.fillStyle='#4d5b4b';c.fillRect(x-2,y+5,14,3);c.fillStyle='#7c8371';c.fillRect(x,y,10,6);c.fillStyle='#a3a58a';c.fillRect(x+2,y-2,6,3);c.fillStyle='#5f6b59';c.fillRect(x+8,y+1,2,5);}for(let i=0;i<70;i++){const x=rnd()*320,y=42+rnd()*110;c.fillStyle='#3f6843';c.fillRect(x,y,1,3);if(i%3===0){c.fillStyle='#c6ba72';c.fillRect(x-1,y-1,3,1);}}}
 export function animateAttack(element,kind='attack'){if(!element)return;const sprite=element.matches?.('.actor-sprite')?element:element.querySelector('.actor-sprite');if(!sprite)return;sprite.classList.remove('attack-pose','cast-pose','shoot-pose');const pose=/heal|cura|spell|mag|summon|cast/.test(kind)?'cast-pose':['bow','crossbow','gun'].includes(sprite.dataset.weapon)?'shoot-pose':'attack-pose';void sprite.offsetWidth;sprite.classList.add(pose);setTimeout(()=>sprite.classList.remove(pose),760);}

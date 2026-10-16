@@ -1,3 +1,4 @@
+import {prepareAccount} from './shared/account.js';
 import {createClient} from 'npm:@supabase/supabase-js@2.57.4';
 import {createRoom,addPlayer,applyAction,emptyMeta,upgradeMeta,unlockRace,normalizeMeta} from './shared/engine.js';
 
@@ -47,12 +48,14 @@ Deno.serve(async req=>{
   if(op==='rotate'){const recoveryCode=token();checked(await admin.from('profiles').update({recovery_hash:await hash(recoveryCode)}).eq('id',p.id));return response({recoveryCode});}
   if(op==='upgrade'||op==='unlockRace'){const updated=op==='upgrade'?upgradeMeta(p.meta,body.key):unlockRace(p.meta,body.raceId);const meta=checked(await admin.rpc('mutate_meta',{pid:p.id,expected_meta:p.meta,updated_meta:updated}));return response({profile:{...publicProfile(p),meta}});}
   if(op==='create'){
+   p=await prepareAccount(admin,p);
    const state:any=createRoom(p.id,p.name,body.classId,p.meta,crypto.getRandomValues(new Uint32Array(1))[0],body.raceId||'humano');
    state.serverName=String(body.serverName||`Sala de ${p.name}`).trim().slice(0,32)||`Sala de ${p.name}`;
    state.public=body.isPublic!==false;
    const room=checked(await admin.rpc('create_game',{pid:p.id,room_code:token().slice(0,10).toUpperCase(),game_state:state}));return response({room});
   }
   if(op==='join'){
+   p=await prepareAccount(admin,p);
    if(typeof body.code!=='string'||!/^[A-F0-9]{10}$/i.test(body.code.trim()))throw new Error('Código da sala inválido.');
    const room=checked(await admin.from('rooms').select('*').eq('code',body.code.trim().toUpperCase()).single());
    const state=addPlayer(room.state,p.id,p.name,body.classId,p.meta,body.raceId||'humano');
