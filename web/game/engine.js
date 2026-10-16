@@ -31,9 +31,9 @@ export function xpNeeded(level){return 35+level*14;}
 export function gainXp(s,p,n){p.xp+=Math.round(n*(1+(p.meta.upgrades.insight||0)*.04+(race(p).xp||0)));while(p.xp>=xpNeeded(p.level)){p.xp-=xpNeeded(p.level);p.level++;p.statPoints+=2;if(p.level%3===0)p.talentPoints++;if(p.level%2===0)p.points++;heal(p,12);p.mana=Math.min(stats(p).mana,p.mana+12);log(s,`${p.name}: NÍVEL ${p.level}! +2 atributos${p.level%3===0?' / +1 talento':''}${p.level%2===0?' / +1 evolução':''}.`,'level');}}
 export function newPlayer(id,name,classId,meta=emptyMeta(),raceId='humano'){
  assert(CLASSES.some(c=>c.id===classId),'Classe inválida.');meta=normalizeMeta(meta);const r=RACES.find(r=>r.id===raceId);assert(r&&(!r.cost||meta.races.includes(raceId)),'Raça bloqueada.');
- const p={id,name:String(name||'Viajante').slice(0,24),classId,raceId,meta:structuredClone(meta),hp:1,mana:1,shield:0,level:1,xp:0,points:0,statPoints:2,talentPoints:0,allocated:{str:0,dex:0,int:0,vit:0},talents:[],skills:{},equipment:{weapon:null,armor:null,helm:null,ring:null,amulet:null},bag:[],gold:25+meta.upgrades.purse*15,potions:2+meta.upgrades.provisions,summons:[],threat:0,guard:false,acted:false,ready:false,encounterDone:false,damage:0,status:{},usedRevive:false,critProcs:0};const v=stats(p);p.hp=v.hp;p.mana=v.mana;return p;
+ const p={id,name:String(name||'Viajante').slice(0,24),classId,raceId,meta:structuredClone(meta),hp:1,mana:1,shield:0,level:1,xp:0,points:0,statPoints:2,talentPoints:0,allocated:{str:0,dex:0,int:0,vit:0},talents:[],skills:{},equipment:{weapon:null,armor:null,helm:null,ring:null,amulet:null},bag:[],gold:25+meta.upgrades.purse*15,potions:2+meta.upgrades.provisions,summons:[],threat:0,guard:false,acted:false,ready:false,encounterDone:false,damage:0,formation:'front',status:{},usedRevive:false,critProcs:0};const v=stats(p);p.hp=v.hp;p.mana=v.mana;return p;
 }
-export function createRoom(host,name,classId,meta,seed=Date.now(),raceId='humano'){return {version:VERSION,seed:seed>>>0,host,phase:'lobby',stage:0,cleared:0,round:0,seq:0,log:[],players:[newPlayer(host,name,classId,meta,raceId)],enemies:[],choices:[],event:null,route:[],rewarded:false,roundAt:0,lootClaimed:false};}
+export function createRoom(host,name,classId,meta,seed=Date.now(),raceId='humano'){return {version:VERSION,seed:seed>>>0,host,combatMode:'atb',phase:'lobby',stage:0,cleared:0,round:0,seq:0,log:[],players:[newPlayer(host,name,classId,meta,raceId)],enemies:[],choices:[],event:null,route:[],rewarded:false,roundAt:0,lootClaimed:false};}
 export function addPlayer(s,id,name,classId,meta,raceId='humano'){assert(s.phase==='lobby','A expedição já começou.');assert(s.players.length<20,'Party cheia (20 pessoas).');assert(!s.players.some(p=>p.id===id),'Você já está na sala.');s.players.push(newPlayer(id,name,classId,meta,raceId));return s;}
 export function pack(items){const grid=Array(60).fill(false),positions=[];for(const it of items){let found=false;for(let y=0;y<=6-it.h&&!found;y++)for(let x=0;x<=10-it.w&&!found;x++){let free=true;for(let j=0;j<it.h;j++)for(let i=0;i<it.w;i++)if(grid[(y+j)*10+x+i])free=false;if(free){for(let j=0;j<it.h;j++)for(let i=0;i<it.w;i++)grid[(y+j)*10+x+i]=true;positions.push({id:it.id,x,y});found=true;}}if(!found)return null;}return positions;}
 export function item(s,level,p){const base=pick(s,BASE_ITEMS),luck=p?((p.meta.upgrades.scavenger||0)*.02+(has(p,'lucky')?.05:0)):0,r=Math.min(.999,random(s)+luck),rarity=r>.985?4:r>.90?3:r>.65?2:r>.27?1:0;
@@ -58,6 +58,7 @@ function hit(s,p,e,power,type,impact=1,options={}){
  if(has(p,'giantkiller')&&e.boss)mult*=1.2;if(has(p,'shatter')&&e.freeze){mult*=1.65;impact*=2;}if(has(p,'fracture')&&e.stunned)mult*=1.5;
  if(p.reprisal&&!options.pet){mult*=1.6;p.reprisal=false;}if(options.pet&&has(p,'pact'))mult*=1.3;if(has(p,'overmind'))mult*=1+p.summons.length*.12;
  if(options.spell&&has(p,'confluence')&&p.lastElement&&p.lastElement!==type)mult*=1.3;if(options.tier===3&&has(p,'archon'))mult*=1.5;
+ if(p.formation==='back'&&['corte','contundente'].includes(type)&&!options.spell)power*=.85;
  const d=Math.max(1,Math.round((7+attr*.95+p.level*1.4)*power*mult*(.92+random(s)*.16)*(crit?1.8:1)*(1-(e.resist[type]||0)/100)*(e.stunned?1.35:1)*(e.curse?1.25:1)));
  damageEnemy(s,p,e,d,type,impact);log(s,`${p.name} > ${e.name}: ${d} ${type}${crit?'! CRÍTICO':''}`,crit?'crit':'damage');
  if(v.leech)heal(p,d*v.leech/100);if(crit&&has(p,'manacrit')&&p.critProcs<3){p.mana=Math.min(v.mana,p.mana+5);p.critProcs++;}
@@ -68,37 +69,45 @@ function hit(s,p,e,power,type,impact=1,options={}){
  if(crit&&has(p,'cascade')){const q=foes(s).find(q=>q.id!==e.id);if(q)damageEnemy(s,p,q,Math.round(d*.45),type,.2,false);}return d;
 }
 function hurt(s,p,n,type,enemy=null,noDodge=false){const v=stats(p);if(!noDodge&&random(s)*100<v.dodge){log(s,`${p.name} ESQUIVOU.`,'good');if(enemy&&has(p,'riposte'))hit(s,p,enemy,.55,cls(p).type);return;}
+ if(p.formation==='back'&&['corte','perfurante','contundente'].includes(type))n*=.8;
  let dmg=Math.max(1,Math.round(n*(1-Math.max(-40,Math.min(70,(v[type]||0)*.65))/100)-v.armor));if(has(p,'glass'))dmg=Math.round(dmg*1.2);if(has(p,'laststand')&&p.hp<v.hp*.3)dmg=Math.ceil(dmg*.75);if(p.guard)dmg=Math.ceil(dmg*.4);
  const absorbed=Math.min(p.shield,dmg);p.shield-=absorbed;dmg-=absorbed;p.hp=Math.max(0,p.hp-dmg);log(s,`${p.name}: −${dmg} PV${absorbed?` / ${absorbed} bloqueado`:''}.`,'hurt');
  if(enemy&&has(p,'thorns')&&(p.guard||has(p,'ironking')))damageEnemy(s,p,enemy,Math.round(dmg*.35),'contundente',.3,false);
  if(p.hp===0&&race(p).revive&&!p.usedRevive){p.usedRevive=true;p.hp=Math.ceil(v.hp*.25);log(s,`${p.name} RECUSA A MORTE.`,'good');}
 }
-export function enemyIntent(s,e){if(e.stunned)return {kind:'stun',label:'QUEBRADO',mult:0};if(e.boss){if(s.round%3===0)return {kind:'aoe',label:'CATACLISMO [TODOS]',mult:.8};if(s.round%3===2)return {kind:'heavy',label:'EXECUÇÃO [TANQUE]',mult:1.65};return {kind:'attack',label:'GOLPE',mult:1};}
- const cycle=(s.round+e.pattern)%4;if(cycle===0)return {kind:'heavy',label:'GOLPE PESADO',mult:1.8};if(cycle===2&&e.role==='caster')return {kind:'aoe',label:'MALDIÇÃO [TODOS]',mult:.65};if(cycle===3&&e.role==='healer')return {kind:'heal',label:'RITUAL DE CURA',mult:0};return {kind:'attack',label:e.role==='assassin'?'CAÇA AO FRÁGIL':'ATAQUE',mult:1};}
+export function enemyIntent(s,e){if(e.stunned)return {kind:'stun',label:'QUEBRADO',mult:0};if(e.boss){const turn=s.combatMode==='atb'?(e.turn||0)+1:s.round;if(turn%3===0)return {kind:'aoe',label:'CATACLISMO [TODOS]',mult:.8};if(turn%3===2)return {kind:'heavy',label:'EXECUÇÃO [TANQUE]',mult:1.65};return {kind:'attack',label:'GOLPE',mult:1};}
+ const cycle=((s.combatMode==='atb'?(e.turn||0)+1:s.round)+e.pattern)%4;if(s.combatMode==='atb'&&cycle===1&&e.role==='fighter')return {kind:'mark',label:'ROMPER GUARDA / MARCA',mult:.8};if(s.combatMode==='atb'&&cycle===2&&e.role==='healer')return {kind:'rally',label:'CÂNTICO / FORTALECE ALIADOS',mult:0};if(cycle===0)return {kind:'heavy',label:'GOLPE PESADO',mult:1.8};if(cycle===2&&e.role==='caster')return {kind:'aoe',label:'MALDIÇÃO [TODOS]',mult:.65};if(cycle===3&&e.role==='healer')return {kind:'heal',label:'RITUAL DE CURA',mult:0};return {kind:'attack',label:e.role==='assassin'?'CAÇA AO FRÁGIL':'ATAQUE',mult:1};}
 function clearBattle(s){s.phase='reward';s.roundAt=Date.now();s.cleared++;for(const p of s.players){if(p.hp<=0)p.hp=Math.ceil(stats(p).hp*.2);gainXp(s,p,65+s.stage*11);p.gold+=16+s.stage*3;p.ready=false;loot(s,p);if(s.stage%5===0){loot(s,p);p.potions++;}}log(s,'VITÓRIA. Distribua atributos e talentos antes de avançar.','good');if(s.stage===15)finish(s,true);}
+function enemyTurn(s,e){
+  if(!living(s).length)return;const intent=enemyIntent(s,e);
+  if(e.stunned){e.turn=(e.turn||0)+1;e.stunned--;if(!e.stunned)e.staggerLock=2;log(s,`${e.name} perdeu a ação.`,'good');return;}
+  if(e.staggerLock)e.staggerLock--;
+  const targets=living(s),top=[...targets].sort((a,b)=>b.threat-a.threat),max=top[0].threat;
+  let target=pick(s,top.filter(p=>p.threat===max));if(!e.boss&&e.role==='assassin'&&max<60)target=[...targets].sort((a,b)=>a.hp/stats(a).hp-b.hp/stats(b).hp)[0];
+  s.visuals=s.visuals||[];s.visuals.push({actor:e.id,enemy:true,type:e.type,kind:intent.kind,target:target.id});
+  const rage=1+Math.max(0,s.round-7)*.07;let attack=e.attack*rage*(e.freeze?.7:1)*(e.empowered?1.25:1)*(e.role==='assassin'&&target.status.exposed?1.35:1);e.empowered=0;if(e.freeze)e.freeze--;if(e.curse)e.curse--;
+  if(intent.kind==='rally'){for(const q of foes(s))q.empowered=1;log(s,`${e.name}: aliados fortalecidos. Elimine o suporte.`,'hurt');}
+  else if(intent.kind==='mark'){hurt(s,target,attack*.8,e.type,e);target.status.exposed=2;log(s,`${target.name} está marcado: caçadores causam +35% dano.`,'hurt');}
+  else if(intent.kind==='heal'){for(const q of foes(s))q.hp=Math.min(q.maxHp,q.hp+Math.ceil(q.maxHp*.15));log(s,`${e.name} curou seus aliados. INTERROMPA O RITUAL.`,'hurt');}
+  else if(intent.kind==='aoe'){log(s,`${e.name}: ATAQUE COLETIVO!`,'hurt');for(const p of targets)hurt(s,p,attack*intent.mult,e.type,e);}
+  else{hurt(s,target,attack*intent.mult,e.type,e);if(e.boss&&targets.length>4){for(const q of top.filter(p=>p!==target).slice(0,Math.floor(targets.length/4)))hurt(s,q,attack*.6,e.type,e);}}
+  if(s.combatMode==='atb'&&intent.mult>0&&target.hp>0){if(e.type==='gelo'){target.status.chill=2;log(s,`${target.name}: LENTIDÃO / velocidade −20%.`,'hurt');}if(e.type==='fogo'){target.status.scorch=2;log(s,`${target.name}: QUEIMADURA / 3 PV por ciclo.`,'hurt');}if(e.role==='fighter'&&e.type==='contundente'){e.hp=Math.min(e.maxHp,e.hp+Math.ceil(e.maxHp*.08));log(s,`${e.name}: devorou essência e se curou.`,'hurt');}}
+  if(e.boss&&e.hp<e.maxHp*.5&&e.phase===1){e.phase=2;e.attack*=1.3;log(s,`${e.name}: FASE II. DANO +30%.`,'crit');}
+ e.turn=(e.turn||0)+1;
+}
 function endRound(s){
  for(const p of living(s)){for(const pet of p.summons){const e=foes(s)[0];if(e)hit(s,p,e,pet.power,pet.type,.6,{pet:true});pet.turns--;if(pet.turns===0&&has(p,'offering')){heal(p,stats(p).hp*.1);p.mana=Math.min(stats(p).mana,p.mana+5);}}p.summons=p.summons.filter(x=>x.turns>0);if(has(p,'antidote'))heal(p,foes(s).filter(e=>e.poison).length*2);}
  for(const e of foes(s)){for(const [key,turns] of [['poison','poisonTurns'],['burn','burnTurns']]){if(e[key]&&e[turns]>0){e.hp=Math.max(0,e.hp-e[key]);e[turns]--;log(s,`${e.name}: ${e[key]} ${key==='burn'?'queimadura':'veneno'}.`,'damage');if(e[turns]===0)e[key]=0;}}}
  if(!foes(s).length){clearBattle(s);return;}
- for(const e of foes(s)){
-  if(!living(s).length)break;const intent=enemyIntent(s,e);
-  if(e.stunned){e.stunned--;if(!e.stunned)e.staggerLock=2;log(s,`${e.name} perdeu a ação.`,'good');continue;}
-  if(e.staggerLock)e.staggerLock--;
-  const targets=living(s),top=[...targets].sort((a,b)=>b.threat-a.threat),max=top[0].threat;
-  let target=pick(s,top.filter(p=>p.threat===max));if(!e.boss&&e.role==='assassin'&&max<60)target=[...targets].sort((a,b)=>a.hp/stats(a).hp-b.hp/stats(b).hp)[0];
-  const rage=1+Math.max(0,s.round-7)*.07;let attack=e.attack*rage*(e.freeze?.7:1);if(e.freeze)e.freeze--;if(e.curse)e.curse--;
-  if(intent.kind==='heal'){for(const q of foes(s))q.hp=Math.min(q.maxHp,q.hp+Math.ceil(q.maxHp*.15));log(s,`${e.name} curou seus aliados. INTERROMPA O RITUAL.`,'hurt');}
-  else if(intent.kind==='aoe'){log(s,`${e.name}: ATAQUE COLETIVO!`,'hurt');for(const p of targets)hurt(s,p,attack*intent.mult,e.type,e);}
-  else{hurt(s,target,attack*intent.mult,e.type,e);if(e.boss&&targets.length>4){for(const q of top.filter(p=>p!==target).slice(0,Math.floor(targets.length/4)))hurt(s,q,attack*.6,e.type,e);}}
-  if(e.boss&&e.hp<e.maxHp*.5&&e.phase===1){e.phase=2;e.attack*=1.3;log(s,`${e.name}: FASE II. DANO +30%.`,'crit');}
- }
+ for(const e of foes(s))enemyTurn(s,e);
  if(!living(s).length){finish(s,false);return;}if(!foes(s).length){clearBattle(s);return;}
  s.round++;s.roundAt=Date.now();for(const p of s.players){p.acted=false;p.guard=false;p.threat=Math.floor(p.threat*.75);p.critProcs=0;p.mana=Math.min(stats(p).mana,p.mana+stats(p).regen+Math.round((stats(p).support-1)*8));if(p.buff)p.buff--;}
 }
 function battle(s){s.phase='combat';s.round=1;s.roundAt=Date.now();const n=s.players.length,boss=s.stage%5===0;
  if(boss){const b=BOSSES[s.stage/5-1],hp=Math.round((230+s.stage*45)*(1+(n-1)*.86));s.enemies=[{...b,id:'boss',boss:true,hp,maxHp:hp,attack:19+s.stage*2.1+Math.sqrt(n)*1.8,stagger:0,staggerMax:hp*.26,staggerLock:0,phase:1,stunned:0,role:'boss',pattern:0}];}
  else{const count=Math.min(6,1+Math.floor(n/3)+(random(s)>.48?1:0)),pool=[['Lanceiro oco','fighter','corte'],['Acólito da febre','caster','fogo'],['Aranha de vidro','assassin','veneno'],['Abade sem olhos','healer','sombrio'],['Carniçal','fighter','contundente'],['Bruxa polar','caster','gelo']];s.enemies=Array.from({length:count},(_,i)=>{const [name,role,type]=pick(s,pool),hp=Math.round((62+s.stage*18)*(1+(n-1)*.83)/count);return {id:`e${i}`,name,role,pattern:i,type,boss:false,hp,maxHp:hp,attack:(15+s.stage*1.75+Math.sqrt(n)*1.5)/Math.pow(count,.25),resist:{[type]:35,sagrado:-20},stunned:0};});}
- for(const p of s.players){p.acted=false;p.threat=0;p.guard=false;p.shield=race(p).shieldStart||0;p.buff=0;p.summons=[];p.usedRevive=false;p.lastElement=null;p.reprisal=false;p.critProcs=0;}
+ for(const p of s.players){p.acted=false;p.threat=0;p.guard=false;p.shield=race(p).shieldStart||0;p.buff=0;p.summons=[];p.status={};p.usedRevive=false;p.lastElement=null;p.reprisal=false;p.critProcs=0;}
+ if(s.combatMode==='atb'){s.clock=0;s.pulse=100;for(const p of s.players){p.nextAt=0;p.acted=false;}for(const e of s.enemies){e.nextAt=75;e.turn=0;}}
  log(s,`${boss?'CHEFE':'COMBATE'} / PROFUNDIDADE ${s.stage}.`,'info');}
 function next(s){s.stage++;s.event=null;s.roundAt=Date.now();for(const p of s.players){p.ready=false;p.encounterDone=false;}if(s.stage%5===0){battle(s);return;}s.phase='route';const choices=[{kind:'combat',name:'Trilha hostil',detail:'Combate / XP e equipamento'},{kind:'event',name:pick(s,['Cripta lacrada','Caminho suspeito','Ruínas antigas']),detail:'Encontro / d20 e risco'}];if(s.stage%3===1)choices.push({kind:'camp',name:'Fogueira & mercador',detail:'Recuperação parcial / shop'});else choices.push({kind:'elite',name:'Caçada de elite',detail:'Inimigos +30% / loot extra'});s.choices=choices;}
 function spellCost(p,sp){let cost=sp.cost*(1-(race(p).discount||0));if(has(p,'archon')&&sp.tier===3)cost*=.7;return Math.max(1,Math.ceil(cost));}
@@ -122,7 +131,8 @@ function cast(s,p,combo,target,ally){
 }
 function defend(s,p){const v=stats(p);p.guard=true;shield(p,8+v.str*.5+(has(p,'bulwark')?20:0));p.threat+=35*v.threat*(has(p,'bulwark')?2:1);if(has(p,'reprisal'))p.reprisal=true;if(has(p,'martyr')){const ally=[...living(s)].sort((a,b)=>a.hp/stats(a).hp-b.hp/stats(b).hp)[0];heal(ally,stats(ally).hp*.12,p);}log(s,`${p.name} DEFENDE. Dano −60%.`,'good');}
 export function applyAction(original,id,a,now=Date.now()){
- assert(original.version===VERSION,'Esta run usa regras antigas. Volte ao santuário para iniciar uma nova.');const s=structuredClone(original),p=s.players.find(p=>p.id===id);assert(p,'Você não pertence à sala.');assert(a&&typeof a.type==='string','Ação inválida.');
+ assert(original.version===VERSION,'Esta run usa regras antigas. Volte ao santuário para iniciar uma nova.');const s=structuredClone(original),p=s.players.find(p=>p.id===id);assert(p,'Você não pertence à sala.');assert(a&&typeof a.type==='string','Ação inválida.');s.visuals=[];
+ if(a.type==='formation'){assert(!['combat','victory','defeat'].includes(s.phase),'Mude a formação fora do combate.');assert(['front','back'].includes(a.row),'Formação inválida.');p.formation=a.row;return s;}
  if(a.type==='start'){assert(id===s.host&&s.phase==='lobby','Somente o líder inicia.');for(const q of s.players)q.bag.push(item(s,1,q));next(s);return s;}
  if(a.type==='route'){assert(id===s.host&&s.phase==='route','O líder escolhe a rota.');assert(Number.isInteger(a.index)&&s.choices[a.index],'Rota inválida.');const choice=s.choices[a.index];s.route.push(choice.kind);s.elite=choice.kind==='elite';if(['combat','elite'].includes(choice.kind)){battle(s);if(s.elite)for(const e of s.enemies){e.hp=Math.round(e.hp*1.3);e.maxHp=e.hp;e.attack*=1.3;}}
   else if(choice.kind==='camp'){s.phase='camp';s.cleared++;for(const q of s.players){heal(q,stats(q).hp*.3);q.mana=Math.min(stats(q).mana,q.mana+Math.ceil(stats(q).mana*.6));gainXp(s,q,20);}log(s,'FOGUEIRA: +30% PV, +60% PM. Poções são vendidas.','good');}
@@ -145,9 +155,10 @@ export function applyAction(original,id,a,now=Date.now()){
   if(!living(s).length){finish(s,false);return s;}if(s.players.every(q=>q.encounterDone)){s.cleared++;s.phase='reward';s.roundAt=now;for(const q of s.players){q.ready=false;if(q.hp===0)q.hp=1;}}return s;
  }
  if(a.type==='ready'){assert(['camp','reward'].includes(s.phase),'Não é hora de avançar.');p.ready=true;if(s.players.every(q=>q.ready))next(s);return s;}
- if(a.type==='skipAbsent'){assert(id===s.host,'Apenas o líder encerra a espera.');assert(now-s.roundAt>=45000,'Espere 45 segundos nesta rodada.');assert(s.phase==='combat','Somente em combate.');for(const q of living(s))if(!q.acted){defend(s,q);q.acted=true;}endRound(s);return s;}
+ if(a.type==='skipAbsent'){assert(id===s.host,'Apenas o líder encerra a espera.');assert(now-s.roundAt>=45000,'Espere 45 segundos nesta rodada.');assert(s.phase==='combat','Somente em combate.');for(const q of living(s))if(!q.acted){defend(s,q);q.acted=true;q.nextAt=(s.clock||0)+actionDelay(q,'defend');}if(s.combatMode==='atb')advanceATB(s);else endRound(s);return s;}
  if(a.type==='abandon'){assert(id===s.host&&!['lobby','victory','defeat'].includes(s.phase),'O líder pode encerrar uma run ativa.');finish(s,false);return s;}
  assert(s.phase==='combat'&&p.hp>0&&!p.acted,'Aguarde sua próxima rodada.');const e=s.enemies.find(e=>e.id===a.target),ally=s.players.find(q=>q.id===a.ally),v=stats(p),c=cls(p);
+ if(s.combatMode==='atb'&&a.type!=='defend')p.guard=false;
  if(a.type==='attack'){assert(e&&e.hp>0,'Selecione um inimigo vivo.');hit(s,p,e,1,c.type);}
  else if(a.type==='defend')defend(s,p);
  else if(a.type==='potion'){assert(p.potions>0,'Sem poções.');if(!has(p,'recycle')||random(s)>.25)p.potions--;heal(p,v.hp*.4*(race(p).potion||1)*(has(p,'chemist')?1.3:1));p.mana=Math.min(v.mana,p.mana+10);if(has(p,'chemist'))p.buff=3;log(s,`${p.name} bebeu uma poção.`,'good');}
@@ -162,7 +173,34 @@ export function applyAction(original,id,a,now=Date.now()){
   else{assert(e&&e.hp>0,'Selecione um inimigo vivo.');const d=hit(s,p,e,1.65,c.type,c.action==='stagger'?3:1);if(c.action==='poison'){e.poison=Math.min(70,(e.poison||0)+5+Math.floor(v.dex*.5));e.poisonTurns=3;}if(c.action==='drain')heal(p,d*.45);}
   log(s,`${p.name}: ${c.skill}.`,'magic');
  }else throw new Error('Ação desconhecida.');
- p.acted=true;if(!foes(s).length){if(s.elite)for(const q of s.players)loot(s,q);clearBattle(s);}else if(living(s).every(q=>q.acted))endRound(s);return s;
+ s.visuals.unshift({actor:p.id,classId:p.classId,action:a.type,type:a.type==='spell'?resolveSpell(a.combo)?.type:c.type,target:a.target,ally:a.ally});
+ p.acted=true;if(!foes(s).length){if(s.elite)for(const q of s.players)loot(s,q);clearBattle(s);}else if(s.combatMode==='atb'){p.nextAt=s.clock+actionDelay(p,a.type);advanceATB(s);}else if(living(s).every(q=>q.acted))endRound(s);return s;
 }
 export function upgradeMeta(meta,key){const m=normalizeMeta(structuredClone(meta)),u=UPGRADES.find(u=>u.id===key);assert(u,'Melhoria inválida.');const lv=m.upgrades[key]||0,cost=u.base+lv*u.step;assert(lv<u.max,'Melhoria no máximo.');assert(m.shards>=cost,`Precisa de ${cost} ecos.`);m.shards-=cost;m.upgrades[key]=lv+1;return m;}
 export function unlockRace(meta,id){const m=normalizeMeta(structuredClone(meta)),r=RACES.find(r=>r.id===id);assert(r&&r.cost&&!m.races.includes(id),'Raça indisponível ou já liberada.');assert(m.shards>=r.cost,`Precisa de ${r.cost} ecos.`);m.shards-=r.cost;m.races.push(id);return m;}
+
+// Deterministic ATB Wait: no timer writes, offline drift, or client-supplied clock.
+export function actionDelay(p,type='attack'){
+ const speed=(70+Math.min(60,stats(p).dex*2))*(p.status?.chill?.8:1);
+ return Math.round(10000/speed*({defend:.65,potion:.8,special:1.25,spell:1.4}[type]||1));
+}
+function advanceATB(s){
+ for(let step=0;step<200&&s.phase==='combat';step++){
+  const heroes=living(s);if(!heroes.length){finish(s,false);return;}
+  const enemies=foes(s);if(!enemies.length){clearBattle(s);return;}
+  const nextHero=Math.min(...heroes.map(p=>Math.max(s.clock,p.nextAt??0)));
+  const nextEnemy=Math.min(...enemies.map(e=>e.nextAt??75));
+  s.clock=Math.min(nextHero,nextEnemy);
+  while(s.clock>=s.pulse){
+   s.pulse+=100;s.round++;
+   for(const p of heroes){p.threat=Math.floor(p.threat*.85);p.critProcs=0;p.mana=Math.min(stats(p).mana,p.mana+stats(p).regen+Math.round((stats(p).support-1)*8));if(has(p,'antidote'))heal(p,foes(s).filter(e=>e.poison).length*2);if(p.buff)p.buff--;if(p.status.exposed)p.status.exposed--;if(p.status.chill)p.status.chill--;if(p.status.scorch){p.status.scorch--;hurt(s,p,3,'fogo',null,true);}
+    for(const pet of p.summons){const e=foes(s)[0];if(e)hit(s,p,e,pet.power,pet.type,.6,{pet:true});pet.turns--;if(!pet.turns&&has(p,'offering')){heal(p,stats(p).hp*.1);p.mana=Math.min(stats(p).mana,p.mana+5);}}p.summons=p.summons.filter(x=>x.turns>0);
+   }
+   for(const e of foes(s))for(const [key,turns] of [['poison','poisonTurns'],['burn','burnTurns']])if(e[key]&&e[turns]>0){e.hp=Math.max(0,e.hp-e[key]);e[turns]--;if(!e[turns])e[key]=0;}
+  }
+  if(!foes(s).length){clearBattle(s);return;}
+  if(!living(s).length){finish(s,false);return;}
+  if(nextHero<=nextEnemy&&heroes.some(p=>p.hp>0&&(p.nextAt??0)<=nextHero)){for(const p of s.players){p.acted=p.hp<=0||(p.nextAt??0)>s.clock;}s.roundAt=Date.now();return;}
+  const e=enemies.find(e=>e.hp>0&&e.nextAt===nextEnemy);if(e&&nextEnemy<=nextHero){enemyTurn(s,e);e.nextAt=s.clock+({assassin:72,caster:118,healer:125,fighter:102,boss:90}[e.role]||100);}
+ }
+}
