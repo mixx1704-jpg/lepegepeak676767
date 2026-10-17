@@ -54,7 +54,7 @@ export function heroPixels(classId='guerreiro',raceId='humano',pose='idle'){
  if(raceId==='kitsune'){r(8,1,5,8,'#bf7747');r(10,3,2,4,'#f1d4a5');r(21,1,5,8,'#bf7747');r(22,3,2,4,'#f1d4a5');r(24,33,6,6,'#c58b55');r(28,28,3,8,'#e5b77e');r(29,27,2,3,'#fff0bd');}
  if(raceId==='astral'){d(8,10,'#e2ecca');d(24,23,'#e2ecca');d(12,30,'#e2ecca');r(16,10,2,2,'#f0ecbb');}
  if(raceId==='silfide'){r(4,24,3,7,'#97b9c5');r(3,23,2,4,'#c7d9cf');r(26,24,3,7,'#97b9c5');r(28,23,2,4,'#c7d9cf');}
- const result=uri(b);cache.set(key,result);return result;
+ const result=uri(b);if(cache.size>=512)cache.delete(cache.keys().next().value);cache.set(key,result);return result;
 }
 export const creaturePixels=drawCreature;
 export const PIXEL_RACES=Object.keys(raceColors);
@@ -76,4 +76,4 @@ export function weaponPixels(kind='sword',rarity=0){const key=`weapon:${kind}:${
  if(kind==='lute'){r(6,1,4,20,ink);r(7,2,2,18,wood);r(2,18,12,12,ink);r(3,19,10,10,wood);r(5,20,7,7,gold);r(7,20,3,4,ink);r(7,5,1,23,edge);r(5,3,6,2,gold);}
  if(kind==='flask'){r(5,8,6,10,ink);r(6,9,4,8,steel);r(2,17,12,13,ink);r(3,18,10,11,shade);r(4,22,8,6,gem);r(4,19,2,6,edge);r(5,7,6,3,wood);}
  if(kind==='fist'){r(1,16,14,13,ink);r(2,17,12,11,gold);r(3,16,2,7,edge);r(6,15,2,8,edge);r(9,16,2,7,edge);r(12,18,2,5,shade);r(4,25,8,2,shade);r(7,24,2,3,gem);}
- const out=uri(b);cache.set(key,out);return out;}
+ const out=uri(b);if(cache.size>=512)cache.delete(cache.keys().next().value);cache.set(key,out);return out;}

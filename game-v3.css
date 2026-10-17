@@ -37,3 +37,8 @@
 
 /* Skill explanations stay inside the existing compact menus. */
 .skill-effects{display:grid;gap:5px;margin-top:7px;font-size:12px;line-height:1.55;color:#cdd7cf;text-transform:none;letter-spacing:normal}.skill-effects>span{display:block}.skill-meta{display:block;margin-top:5px;color:#c7b980}.skill-list button{align-items:start;text-align:left}.tree-node .skill-effects{font-size:11px}.tree-node .skill-meta{font-size:10px}
+
+.trait-pages{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}.trait-search{display:block;margin:12px 0}.trait-search input{width:100%}.traits-grid button{content-visibility:auto;contain-intrinsic-size:180px}.spell-description{padding:12px;border-left:2px solid #a99b71;line-height:1.6}#commands{flex-wrap:wrap}#commands [data-do="dodge"]{color:#b9d8bd}
+@media(prefers-reduced-motion:reduce){.pixel-sprite,.creature-image,.actor-shadow{animation:none!important}}
+
+.page-hidden *{animation-play-state:paused!important}.menu-open .hero-sprite .actor-body,.menu-open .creature-image{animation-play-state:paused!important}.monster.fallen{pointer-events:none;visibility:hidden}.traits-grid{contain:layout style}

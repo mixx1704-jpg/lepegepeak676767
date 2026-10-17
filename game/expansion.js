@@ -1,3 +1,5 @@
+import {INFERNAL_TRAITS} from './trait-codex.js';
+import {INFERNAL_ENEMIES} from './infernal-content.js';
 import {extendTrees,deepNodes} from './deep-content.js';
 import {NEW_ENEMIES} from './adventures.js';
 import {CLASSES} from './data.js';
@@ -107,7 +109,8 @@ for(const [i,branch] of ECHO_TREE.entries()){
  branch.nodes=nodes;
 }
 export function echoBonus(meta,key){return ECHO_TREE.flatMap(b=>b.nodes).reduce((sum,n)=>sum+(n.mods?.[key]||0)*(meta?.upgrades?.[n.id]||0),0);}
+TRAITS.push(...INFERNAL_TRAITS);
 export const TRAIT_BY_ID=new Map(TRAITS.map(t=>[t.id,t]));
 export function echoTotals(meta){const out={};for(const branch of ECHO_TREE)for(const node of branch.nodes){const level=meta?.upgrades?.[node.id]||0;if(level)for(const [key,value] of Object.entries(node.mods||{}))out[key]=(out[key]||0)+value*level;}return out;}
 
-ENEMY_SPECIES.push(...NEW_ENEMIES);
+ENEMY_SPECIES.push(...NEW_ENEMIES,...INFERNAL_ENEMIES);

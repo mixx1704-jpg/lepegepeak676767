@@ -1,3 +1,4 @@
+import {ARCANE_BY_FORMULA,ARCANE_SPELLS} from './arcane-codex.js';
 import {DEEP_TALENTS} from './deep-content.js';
 import {EXTRA_RACES,ECHO_TREE,DEATH_TOUCH} from './expansion.js';
 export const RACES = [
@@ -84,7 +85,7 @@ function legacySpell(input){
  const f=forms[j],tier=tokens.length-1,boost=tier===1?1:m===0?(tier===3?2.05:1.45):(tier===3?1.65:1.2),cost=Math.ceil(f[3]*(tier===1?1:m===0?(tier===3?1.9:1.45):(tier===3?1.3:1.12)));
  return {combo:tokens.join(' '),name:`${f[0]} de ${RUNE_DATA[i].name}${tier>1?(m===0?' Voraz':' Persistente'):''}${tier===3?': Absoluto':''}`,kind:f[1],type:RUNE_DATA[i].type,cost,power:f[2]*boost,tier,duration:2+(tier>1&&m===1?2:0),element:RUNES[i]};
 }
-export function randomFormula(s,rng){const i=Math.floor(rng(s)*14),j=Math.floor(rng(s)*14),tokens=[RUNES[i],RUNES[j]];if(rng(s)>.6)tokens.push(RUNES[(i+j+3)%14]);return resolveSpell(tokens.join(' '));}
+export function randomFormula(s,rng){if(rng(s)<.22)return {...ARCANE_SPELLS[Math.floor(rng(s)*ARCANE_SPELLS.length)]};const i=Math.floor(rng(s)*14),j=Math.floor(rng(s)*14),tokens=[RUNES[i],RUNES[j]];if(rng(s)>.6)tokens.push(RUNES[(i+j+3)%14]);return resolveSpell(tokens.join(' '));}
 
 RACES.push(...EXTRA_RACES);
 const raceSpecial={humano:{},anao:{S:2,E:2,A:-2,C:-1},elfo:{I:3,P:1,E:-2},orc:{S:4,I:-3,C:-2},umbriano:{A:3,E:-2},infernal:{I:2,E:-1},revenante:{E:2,C:-2},forjado:{E:3,A:-2},astral:{I:4,E:-3},draconico:{S:2,E:2,C:-2}};
@@ -94,7 +95,7 @@ for(const [key,name,req] of [['S','Potência','str'],['P','Precisão','dex'],['E
 TALENTS.push(...DEEP_TALENTS);
 export function resolveSpell(input){
  const tokens=String(input||'').trim().toUpperCase().split(/\s+/).filter(Boolean);if(tokens.length<2||tokens.length>12||tokens.some(t=>!RUNES.includes(t)))return null;
- const combo=tokens.join(' ');if(combo===DEATH_TOUCH)return {combo,name:'DEATH TOUCH',kind:'death',type:'sombrio',cost:100,power:8,tier:11,duration:1,element:'UMBRA'};
+ const combo=tokens.join(' ');if(ARCANE_BY_FORMULA.has(combo))return {...ARCANE_BY_FORMULA.get(combo)};if(combo===DEATH_TOUCH)return {combo,name:'DEATH TOUCH',kind:'death',type:'sombrio',cost:100,power:8,tier:11,duration:1,element:'UMBRA'};
  if(tokens.length<=4)return legacySpell(combo);
  const i=RUNES.indexOf(tokens[0]),j=RUNES.indexOf(tokens[1]),f=forms[j],n=tokens.length;
  const distinct=new Set(tokens).size,boost=1+(n-2)*.18+distinct*.025;

@@ -1,0 +1,103 @@
+{
+  "note": "A/B intercalado no mesmo processo; 20 jogadores, 8 inimigos neutros, 220 comandos por s\u00e9rie; somente motor local, sem rede/renderiza\u00e7\u00e3o.",
+  "runs": [
+    {
+      "version": "v8.1",
+      "advanced": false,
+      "meanMs": 1.5820409090908976,
+      "p50Ms": 1.4782000000000153,
+      "p95Ms": 2.240300000000161
+    },
+    {
+      "version": "v9",
+      "advanced": false,
+      "meanMs": 1.3230595454545364,
+      "p50Ms": 1.2746999999999389,
+      "p95Ms": 2.037700000000086
+    },
+    {
+      "version": "v8.1",
+      "advanced": true,
+      "meanMs": 3.8389336363636186,
+      "p50Ms": 3.462300000000141,
+      "p95Ms": 5.7199999999998
+    },
+    {
+      "version": "v9",
+      "advanced": true,
+      "meanMs": 3.429862272727275,
+      "p50Ms": 2.9704000000001543,
+      "p95Ms": 5.377599999999802
+    },
+    {
+      "version": "v9",
+      "advanced": false,
+      "meanMs": 1.2600127272727397,
+      "p50Ms": 1.2451999999998407,
+      "p95Ms": 1.7898999999997613
+    },
+    {
+      "version": "v8.1",
+      "advanced": false,
+      "meanMs": 1.3769054545454371,
+      "p50Ms": 1.390400000000227,
+      "p95Ms": 1.6606000000001586
+    },
+    {
+      "version": "v9",
+      "advanced": true,
+      "meanMs": 2.91857500000001,
+      "p50Ms": 2.7695999999996275,
+      "p95Ms": 4.035899999999856
+    },
+    {
+      "version": "v8.1",
+      "advanced": true,
+      "meanMs": 3.1202427272727165,
+      "p50Ms": 3.1149999999997817,
+      "p95Ms": 3.592999999999847
+    },
+    {
+      "version": "v8.1",
+      "advanced": false,
+      "meanMs": 1.3961409090908918,
+      "p50Ms": 1.375,
+      "p95Ms": 1.8108000000001994
+    },
+    {
+      "version": "v9",
+      "advanced": false,
+      "meanMs": 1.317085454545461,
+      "p50Ms": 1.237199999999575,
+      "p95Ms": 2.2887000000000626
+    },
+    {
+      "version": "v8.1",
+      "advanced": true,
+      "meanMs": 3.2973181818181603,
+      "p50Ms": 3.149199999999837,
+      "p95Ms": 4.322000000000116
+    },
+    {
+      "version": "v9",
+      "advanced": true,
+      "meanMs": 2.8461009090909184,
+      "p50Ms": 2.725000000000364,
+      "p95Ms": 3.699300000000221
+    }
+  ],
+  "summary": [
+    {
+      "advanced": false,
+      "baselineMeanMedianMs": 1.414533333333414,
+      "newMeanMedianMs": 1.2523666666664515,
+      "reductionPercent": 11.5
+    },
+    {
+      "advanced": true,
+      "baselineMeanMedianMs": 3.2421666666665865,
+      "newMeanMedianMs": 2.821666666666715,
+      "reductionPercent": 13.0
+    }
+  ]
+}

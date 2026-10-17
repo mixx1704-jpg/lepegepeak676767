@@ -1,0 +1,16 @@
+/* Encounter-specific native pixel scenes. No looping effect or layout animation. */
+#encounter-story .encounter-cinema{height:205px;background:#17272a;contain:layout paint;isolation:isolate;image-rendering:pixelated;border-bottom:2px solid #61736b}
+.encounter-cinema .cinema-horizon{position:absolute;inset:0;background:linear-gradient(0deg,#43554966,transparent 70%);clip-path:polygon(0 35%,10% 19%,20% 37%,32% 10%,45% 33%,59% 18%,70% 39%,83% 14%,100% 32%,100% 100%,0 100%)}
+.encounter-cinema .cinema-floor{position:absolute;inset:78% 0 0;background:repeating-linear-gradient(90deg,#53634d44 0 12px,#273e3644 12px 24px);border-top:3px solid #72806a55}
+#encounter-story .encounter-cinema .cinema-hero{left:4%;bottom:13%;animation:none;z-index:3;transform-origin:50% 100%}#encounter-story .cinema-hero .actor-sprite{width:95px;height:116px}
+.cinema-prop{position:absolute;right:17%;bottom:14%;width:136px;height:150px;transform-origin:50% 80%;z-index:2}.cinema-prop svg{width:100%;height:100%;overflow:visible}
+.cinema-aura{position:absolute;width:145px;height:145px;right:16%;bottom:15%;border:8px solid #dfbd69;box-shadow:0 0 0 7px #dfbd6933;opacity:0;z-index:1;clip-path:polygon(25% 0,75% 0,100% 25%,100% 75%,75% 100%,25% 100%,0 75%,0 25%)}
+[data-outcome=failure] .cinema-aura{border-color:#c36b66;box-shadow:0 0 0 7px #c36b6633}.cinema-fragments{position:absolute;right:30%;bottom:45%;z-index:4}.cinema-fragments i{position:absolute;width:5px;height:5px;background:#dcc486;opacity:0}.cinema-fragments i:nth-child(3n){background:#8fc1a0}[data-outcome=failure] .cinema-fragments i{background:#b85f52}
+.cinema-caption{position:absolute;left:12px;bottom:7px;text-transform:uppercase;letter-spacing:.16em;font-size:9px;color:#cfcdad;z-index:5}
+[data-scene=library] .cinema-floor,[data-scene=well] .cinema-floor,[data-scene=bell] .cinema-floor{background:#42687388;border-color:#a3bfc0}
+[data-scene=forge],[data-scene=machine],[data-scene=flesh]{background:#332622!important}[data-scene=forge] .cinema-horizon,[data-scene=machine] .cinema-horizon{background:#9b533633}
+[data-scene=rift] .cinema-floor,[data-scene=bridge] .cinema-floor{background:#07171b;border-top:0}[data-scene=glass] .cinema-horizon{background:#697c9166}
+[data-scene=star],[data-scene=constellation],[data-scene=nest]{background:#121c31!important}[data-scene=masks] .cinema-horizon{background:#70634e66}
+.cinema-settled .cinema-prop,.cinema-settled .cinema-hero{transform:none!important}.cinema-settled[data-outcome=failure]{border-bottom-color:#b66d59}.cinema-settled[data-outcome=success]{border-bottom-color:#bca975}.cinema-settled .cinema-aura,.cinema-settled .cinema-fragments{display:none}
+@media(prefers-reduced-motion:reduce){.encounter-cinema *{animation:none!important;transition:none!important}}
+@media(max-width:420px){.cinema-prop{right:12%;width:115px}.cinema-fragments{right:26%}#encounter-story .cinema-hero .actor-sprite{width:78px;height:100px}}

@@ -1,0 +1,37 @@
+// Authored five-rune incantations; Latin-inspired names, distinct tactical riders.
+const rows=[
+ ['Ignis Funebris','IGNIS UMBRA ANIMA TERRA IGNIS','burn','fogo',28,1.7,'funeral','Aplica queimadura e remove a proteção do alvo.'],
+ ['Venenum Ignitum','TOXIS IGNIS SANGUIS ANIMA TOXIS','burn','fogo',30,1.5,'combust','Consome o veneno do alvo para causar dano adicional e aplicar queimadura.'],
+ ['Glacies Fracta','GLACIS FERRUM TERRA ANIMA GLACIS','stagger','gelo',29,1.6,'shatter','Impacto elevado; causa um golpe adicional se o alvo já estava congelado.'],
+ ['Vinculum Hiemis','GLACIS CHRONOS UMBRA TERRA GLACIS','freeze','gelo',32,1.1,'frostbind','Congela e atrasa a próxima ação do alvo em 25 UT.'],
+ ['Fulmen Conductum','FULGUR FERRUM GLACIS ANIMA FULGUR','chain','eletrico',34,1.6,'conductor','Corrente elétrica: os alvos atingidos ficam marcados para combos de outro aliado.'],
+ ['Tempestas Cineris','IGNIS VENTUS UMBRA FULGUR IGNIS','aoe','fogo',40,1.25,'ashstorm','Atinge todos os inimigos e aplica queimadura de três ciclos.'],
+ ['Lux Medica','LUX VITA ANIMA SANGUIS LUX','heal','sagrado',26,2.4,'cleanse','Cura dirigida e remove veneno, sangramento, queimadura e infecção.'],
+ ['Pax Profunda','VITA LUX CHRONOS ANIMA VITA','partyheal','sagrado',42,1.4,'respite','Cura coletiva e remove lentidão e maldição dos aliados vivos.'],
+ ['Aegis Ferrea','FERRUM TERRA LUX ANIMA FERRUM','shield','sagrado',30,2.3,'thorns','Escudo dirigido; o protegido armazena uma retaliação de +35% no próximo golpe.'],
+ ['Velum Noctis','UMBRA LUX CHRONOS ANIMA UMBRA','shield','sombrio',27,1.8,'veil','Escudo dirigido e −30% de recuperação ATB por dois ciclos.'],
+ ['Mors Tacita','UMBRA ANIMA CHRONOS FERRUM UMBRA','curse','sombrio',30,1.15,'silence','Amaldiçoa e cancela a próxima técnica especial do inimigo.'],
+ ['Sanguis Mutuus','SANGUIS VITA UMBRA ANIMA SANGUIS','drain','sombrio',28,1.8,'bloodshare','Drena vida; um aliado vivo com menor proporção de PV também recebe cura.'],
+ ['Fames Aetheris','AETHER UMBRA ANIMA CHRONOS AETHER','drain','arcano',29,1.5,'manasteal','Drena vida e recupera 12 PM.'],
+ ['Tempus Fugit','CHRONOS VENTUS FULGUR ANIMA CHRONOS','partyheal','arcano',38,.65,'partyhaste','Cura leve coletiva e acelera os aliados vivos por dois ciclos.'],
+ ['Hora Nulla','CHRONOS UMBRA TERRA ANIMA CHRONOS','freeze','arcano',36,.7,'timelock','Congela e atrasa o alvo em 40 UT; chefes sofrem atraso de 20 UT.'],
+ ['Ferrum Nudum','FERRUM UMBRA LUX TERRA FERRUM','hit','corte',27,1.8,'unward','Remove proteção e fortalecimento do alvo após o golpe.'],
+ ['Oculus Apertus','LUX UMBRA FERRUM ANIMA LUX','hit','sagrado',24,1.25,'expose','Marca o alvo para combo e revela uma abertura: +25% de dano recebido por duas ações.'],
+ ['Anima Custos','ANIMA TERRA VITA LUX ANIMA','summon','arcano',35,.95,'guardian','Invoca um espírito (esqueleto para necromantes) e restaura 20% da vida dos seus servos.'],
+ ['Legio Ossium','ANIMA UMBRA FERRUM SANGUIS ANIMA','summon','sombrio',42,1.1,'archer','Invoca um arqueiro ósseo em vez do servo padrão.'],
+ ['Eques Sepulcri','UMBRA FERRUM ANIMA TERRA UMBRA','summon','sombrio',48,1.35,'knight','Invoca um cavaleiro sepulcral que absorve parte dos ataques contra o invocador.'],
+ ['Reditus Vitae','VITA ANIMA LUX CHRONOS VITA','revive','sagrado',48,.5,'returnshield','Revive com 50% dos PV e escudo igual a 15% dos PV máximos.'],
+ ['Corvus Ater','UMBRA VENTUS TOXIS ANIMA UMBRA','poison','sombrio',26,1.45,'poisonslow','Envenena e reduz a velocidade ATB do alvo por duas ações.'],
+ ['Terra Rupta','TERRA FERRUM FULGUR ANIMA TERRA','aoe','contundente',38,1.45,'quake','Atinge todos; chefes recebem um segundo impacto menor na barra de quebra.'],
+ ['Lumen Ultimum','LUX IGNIS VITA ANIMA LUX','hit','sagrado',36,2,'lastlight','Cura o conjurador em 15% dos PV máximos se o alvo cair.'],
+ ['Pactum Umbrae','UMBRA SANGUIS ANIMA VITA UMBRA','curse','sombrio',24,1.5,'bloodpact','Maldição forte; consome também 10% dos PV máximos do conjurador.'],
+ ['Nodus Vitalis','VITA TERRA FERRUM ANIMA VITA','heal','sagrado',28,1.8,'healshield','Cura dirigida e converte 25% da cura base em escudo.'],
+ ['Fulgur Geminum','FULGUR CHRONOS FERRUM ANIMA FULGUR','hit','eletrico',32,1.35,'twin','Dois impactos elétricos iguais no mesmo alvo.'],
+ ['Nix Mortua','GLACIS UMBRA VITA ANIMA GLACIS','aoe','gelo',39,1.15,'winter','Dano coletivo; todos os sobreviventes ficam lentos por duas ações.'],
+ ['Venenum Fractum','TOXIS FERRUM TERRA ANIMA TOXIS','poison','veneno',28,1.35,'corrode','Envenena e remove a proteção ritual do alvo.'],
+ ['Cantus Vacui','AETHER ANIMA UMBRA LUX AETHER','aoe','arcano',44,1.15,'voidchorus','Dano coletivo e anula a próxima técnica de até dois inimigos comuns.'],
+ ['Manus Avida','SANGUIS FERRUM UMBRA ANIMA SANGUIS','drain','sombrio',31,1.7,'harvest','Drena vida e recupera 8 PM se abater o alvo.'],
+ ['Via Celeris','VENTUS CHRONOS LUX ANIMA VENTUS','shield','arcano',32,1.4,'advance','Protege um aliado escolhido e reduz em 25 UT o ATB que ainda falta.' ]
+];
+export const ARCANE_SPELLS=Object.freeze(rows.map(([name,combo,kind,type,cost,power,mechanic,desc])=>Object.freeze({name,combo,kind,type,cost,power,mechanic,desc,tier:4,duration:3,element:combo.split(' ')[0],fx:'incantation:'+mechanic})));
+export const ARCANE_BY_FORMULA=new Map(ARCANE_SPELLS.map(s=>[s.combo,s]));
